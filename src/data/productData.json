@@ -1,0 +1,212 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Simba Beer Total Sales",
+      "jan": 6210,
+      "feb": 6890,
+      "jun": 7200,
+      "jul": 7500,
+      "aug": 7800,
+      "variance": 10.9,
+      "varianceStatus": "up",
+      "breakage": 45,
+      "marketShare": 18.2,
+      "marketShareStatus": "up",
+      "isCategory": true,
+      "children": [
+        {
+          "id": "1-1",
+          "name": "Simba Jungle Wheat Beer 500ml Can",
+          "jan": 2340,
+          "feb": 2580,
+          "jun": 2700,
+          "jul": 2800,
+          "aug": 2900,
+          "variance": 10.3,
+          "varianceStatus": "up",
+          "breakage": 12,
+          "marketShare": 6.8,
+          "marketShareStatus": "up"
+        },
+        {
+          "id": "1-2",
+          "name": "Simba Roar Extra Strong Beer 650ml",
+          "jan": 1890,
+          "feb": 2100,
+          "variance": 11.1,
+          "varianceStatus": "up",
+          "breakage": 18,
+          "marketShare": 5.9,
+          "marketShareStatus": "up"
+        },
+        {
+          "id": "1-3",
+          "name": "Simba Roar Light Premium Beer 500ml",
+          "jan": 1980,
+          "feb": 2210,
+          "variance": 11.6,
+          "varianceStatus": "up",
+          "breakage": 15,
+          "marketShare": 5.5,
+          "marketShareStatus": "up"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "ZigZag Vodka Total Sales",
+      "jan": 3240,
+      "feb": 3580,
+      "variance": 10.5,
+      "varianceStatus": "up",
+      "breakage": 28,
+      "marketShare": 12.8,
+      "marketShareStatus": "up",
+      "isCategory": true,
+      "children": [
+        {
+          "id": "2-1",
+          "name": "ZigZag Original Vodka 750ml",
+          "jan": 1250,
+          "feb": 1380,
+          "variance": 10.4,
+          "varianceStatus": "up",
+          "breakage": 12,
+          "marketShare": 4.2,
+          "marketShareStatus": "up"
+        },
+        {
+          "id": "2-2",
+          "name": "ZigZag Green Apple Vodka 750ml",
+          "jan": 980,
+          "feb": 1080,
+          "variance": 10.2,
+          "varianceStatus": "up",
+          "breakage": 8,
+          "marketShare": 3.8,
+          "marketShareStatus": "up"
+        },
+        {
+          "id": "2-3",
+          "name": "ZigZag Orange Vodka 750ml",
+          "jan": 1010,
+          "feb": 1120,
+          "variance": 10.9,
+          "varianceStatus": "up",
+          "breakage": 8,
+          "marketShare": 4.8,
+          "marketShareStatus": "up"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Officers Choice Whisky",
+      "jan": 2890,
+      "feb": 3120,
+      "variance": 8.0,
+      "varianceStatus": "up",
+      "breakage": 35,
+      "marketShare": 15.6,
+      "marketShareStatus": "up",
+      "isCategory": true,
+      "children": [
+        {
+          "id": "3-1",
+          "name": "Officers Choice Blue Whisky 750ml",
+          "jan": 1890,
+          "feb": 2040,
+          "variance": 7.9,
+          "varianceStatus": "up",
+          "breakage": 22,
+          "marketShare": 10.2,
+          "marketShareStatus": "up"
+        },
+        {
+          "id": "3-2",
+          "name": "Officers Choice Premium Whisky 750ml",
+          "jan": 1000,
+          "feb": 1080,
+          "variance": 8.0,
+          "varianceStatus": "up",
+          "breakage": 13,
+          "marketShare": 5.4,
+          "marketShareStatus": "up"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Royal Challenge Whisky",
+      "jan": 2150,
+      "feb": 2280,
+      "variance": 6.0,
+      "varianceStatus": "up",
+      "breakage": 25,
+      "marketShare": 11.8,
+      "marketShareStatus": "up",
+      "isCategory": true,
+      "children": [
+        {
+          "id": "4-1",
+          "name": "Royal Challenge Premium Whisky 750ml",
+          "jan": 1350,
+          "feb": 1420,
+          "variance": 5.2,
+          "varianceStatus": "up",
+          "breakage": 15,
+          "marketShare": 7.4,
+          "marketShareStatus": "up"
+        },
+        {
+          "id": "4-2",
+          "name": "Royal Challenge Deluxe Whisky 750ml",
+          "jan": 800,
+          "feb": 860,
+          "variance": 7.5,
+          "varianceStatus": "up",
+          "breakage": 10,
+          "marketShare": 4.4,
+          "marketShareStatus": "up"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Bacardi Rum",
+      "jan": 1680,
+      "feb": 1750,
+      "variance": 4.2,
+      "varianceStatus": "up",
+      "breakage": 18,
+      "marketShare": 9.2,
+      "marketShareStatus": "up",
+      "isCategory": true,
+      "children": [
+        {
+          "id": "5-1",
+          "name": "Bacardi White Rum 750ml",
+          "jan": 980,
+          "feb": 1020,
+          "variance": 4.1,
+          "varianceStatus": "up",
+          "breakage": 10,
+          "marketShare": 5.4,
+          "marketShareStatus": "up"
+        },
+        {
+          "id": "5-2",
+          "name": "Bacardi Gold Rum 750ml",
+          "jan": 700,
+          "feb": 730,
+          "variance": 4.3,
+          "varianceStatus": "up",
+          "breakage": 8,
+          "marketShare": 3.8,
+          "marketShareStatus": "up"
+        }
+      ]
+    }
+  ]
+}

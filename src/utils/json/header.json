@@ -1,0 +1,80 @@
+{
+  "salesPersonData": [
+    {
+      "id": 0,
+      "name": "All"
+    },
+    {
+      "id": 1,
+      "name": "vikas chaudhary",
+      "email": "v.chaudhary9899@gmail.com",
+      "phone": "1234567890"
+    },
+    {
+      "id": 2,
+      "name": "Shubham Singh",
+      "email": "shubhamsingh79390@gmail.com",
+      "phone": "1234567890"
+    },
+    {
+      "id": 3,
+      "name": "Sunish Choudhary",
+      "email": "sunish540@gmail.com",
+      "phone": "1234567890"
+    },
+    {
+      "id": 4,
+      "name": "Dimple Sehgal",
+      "email": "dimplesehgal1997@gmail.com",
+      "phone": "1234567890"
+    },
+    {
+      "id": 5,
+      "name": "Deepanshu Sagar",
+      "email": "deepanshusagar22@gmail.com",
+      "phone": "1234567890"
+    },
+    {
+      "id": 6,
+      "name": "Gaurav Singh",
+      "email": "gauravsingh6415@gmail.com",
+      "phone": "1234567890"
+    },
+    {
+      "id": 7,
+      "name": "Gaurav Gautam",
+      "email": "info.gauravgautam21@gmail.com",
+      "phone": "1234567890"
+    },
+    {
+      "id": 8,
+      "name": "HITESH KUMAR",
+      "email": "hitesh87509@gmail.com",
+      "phone": "1234567890"
+    },
+    {
+      "id": 9,
+      "name": "Utkarsh",
+      "email": "utkarshsinghal369@gmail.com",
+      "phone": "1234567890"
+    }
+  ],
+  "dpCode": [
+    {
+      "id": 1,
+      "code": "DP001",
+      "name": "DP001"
+    },
+    {
+      "id": 2,
+      "code": "DP002",
+      "name": "DP002"
+    },
+    {
+      "id": 3,
+      "code": "DP003",
+      "name": "DP003"
+    }
+  ]
+
+}
