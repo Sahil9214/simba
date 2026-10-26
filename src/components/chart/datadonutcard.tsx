@@ -146,9 +146,9 @@ export function DataDonutCard(props: ExtendedChartCardProps) {
                 if (!Array.isArray(activeQuery.data)) return null;
                 return activeQuery.data.map((item: any) => ({
                     key: item.skuId || item.productName?.toLowerCase().replace(/\s+/g, '-') || `product-${Math.random()}`,
-                    label: `${item.productName} (${item.sizeML})ml` || 'Unknown Product',
-                    value: item.salesUnits || 0,
-                    sizeML: item.sizeML || 0
+                    label: `${item.productName || item.skuName || 'Product'} (${item.sizeML || 330})ml`,
+                    value: item.salesUnits ?? item.soldUnits ?? 0,
+                    sizeML: item.sizeML || 330
                 }));
 
             case 'topResellersShops':
@@ -162,16 +162,16 @@ export function DataDonutCard(props: ExtendedChartCardProps) {
             case 'demandBySku':
                 if (!Array.isArray(activeQuery.data)) return null;
                 return activeQuery.data.map((item: any) => {
-                    const productName = item.productName || 'Unknown SKU';
-                    const sizeML = item.sizeML || 0;
+                    const productName = item.productName || item.name || item.sku || 'Unknown SKU';
+                    const sizeML = item.sizeML || 330;
                     const displayLabel = sizeML > 0
                         ? `${productName} (${sizeML}ml)`
                         : productName;
 
                     return {
-                        key: item.skuId || productName?.toLowerCase().replace(/\s+/g, '-') || `sku-${Math.random()}`,
+                        key: item.skuId || item.id || productName?.toLowerCase().replace(/\s+/g, '-') || `sku-${Math.random()}`,
                         label: displayLabel,
-                        value: item.demand || 0,
+                        value: item.demand ?? item.value ?? 0,
                         sizeML: sizeML
                     };
                 });
@@ -179,8 +179,8 @@ export function DataDonutCard(props: ExtendedChartCardProps) {
             case 'salesByPackSize':
                 if (!Array.isArray(activeQuery.data)) return null;
                 return activeQuery.data.map((item: any) => {
-                    const productName = item.productName || 'Unknown Pack Size';
-                    const packSize = item.skuPackSize || item.sizeML || 0;
+                    const productName = item.productName || item.packSize || 'Pack Size';
+                    const packSize = item.skuPackSize || item.sizeML || 330;
                     const displayLabel = packSize
                         ? `${productName} (${packSize}ml)`
                         : productName;
@@ -188,7 +188,7 @@ export function DataDonutCard(props: ExtendedChartCardProps) {
                     return {
                         key: item.skuId || productName?.toLowerCase().replace(/\s+/g, '-') || `pack-${Math.random()}`,
                         label: displayLabel,
-                        value: item.sales || 0,
+                        value: item.sales ?? item.units ?? 0,
                         sizeML: packSize
                     };
                 });

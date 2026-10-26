@@ -1,0 +1,2011 @@
+/**
+ * Dedicated Constant File for Dummy Data
+ * All lists are capped at maximum 10 items for optimal presentation.
+ */
+
+// --- AUTH & USER DUMMY DATA ---
+
+export const DUMMY_USER = {
+  id: "user-admin-01",
+  email: "admin@simbabeer.com",
+  first_name: "Simba",
+  last_name: "Administrator",
+  phone: "+91 98765 43210",
+  role: "super_admin",
+  is_active: true,
+  email_verified: true,
+  user_metadata: {
+    role: "super_admin",
+    first_name: "Simba",
+    last_name: "Administrator",
+    phone: "+91 98765 43210",
+    is_active: true,
+  },
+  created_at: new Date("2024-01-01").toISOString(),
+  updated_at: new Date().toISOString(),
+};
+
+export const DUMMY_STAFF_USER = {
+  id: "user-staff-01",
+  email: "staff@simbabeer.com",
+  first_name: "Rajesh",
+  last_name: "Kumar",
+  phone: "+91 98111 22334",
+  role: "staff",
+  is_active: true,
+  email_verified: true,
+  user_metadata: {
+    role: "staff",
+    first_name: "Rajesh",
+    last_name: "Kumar",
+    phone: "+91 98111 22334",
+    is_active: true,
+  },
+  created_at: new Date("2024-01-01").toISOString(),
+  updated_at: new Date().toISOString(),
+};
+
+// Valid JWT token with far-future expiration (2099)
+const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+const payload = btoa(JSON.stringify({
+  id: DUMMY_USER.id,
+  email: DUMMY_USER.email,
+  role: DUMMY_USER.role,
+  first_name: DUMMY_USER.first_name,
+  last_name: DUMMY_USER.last_name,
+  exp: 4102444800, // 2099
+  iat: 1700000000,
+}));
+const signature = "dummy_signature_token_simba_demo";
+export const DUMMY_AUTH_TOKEN = `${header}.${payload}.${signature}`;
+
+export const DUMMY_AUTH_SESSION = {
+  access_token: DUMMY_AUTH_TOKEN,
+  token_type: "bearer",
+  user: DUMMY_USER,
+};
+
+export const DUMMY_USERS_LIST = [
+  {
+    id: "usr-001",
+    email: "admin@simbabeer.com",
+    first_name: "Simba",
+    last_name: "Administrator",
+    phone: "+91 98765 43210",
+    role: "super_admin",
+    is_active: true,
+    created_at: "2024-01-01T00:00:00.000Z",
+  },
+  {
+    id: "usr-002",
+    email: "manager.delhi@simbabeer.com",
+    first_name: "Vikram",
+    last_name: "Malhotra",
+    phone: "+91 98123 45678",
+    role: "manager",
+    is_active: true,
+    created_at: "2024-01-15T00:00:00.000Z",
+  },
+  {
+    id: "usr-003",
+    email: "rajesh.kumar@simbabeer.com",
+    first_name: "Rajesh",
+    last_name: "Kumar",
+    phone: "+91 98111 22334",
+    role: "staff",
+    is_active: true,
+    created_at: "2024-02-01T00:00:00.000Z",
+  },
+  {
+    id: "usr-004",
+    email: "amit.sharma@simbabeer.com",
+    first_name: "Amit",
+    last_name: "Sharma",
+    phone: "+91 98222 33445",
+    role: "staff",
+    is_active: true,
+    created_at: "2024-02-10T00:00:00.000Z",
+  },
+  {
+    id: "usr-005",
+    email: "priya.singh@simbabeer.com",
+    first_name: "Priya",
+    last_name: "Singh",
+    phone: "+91 98333 44556",
+    role: "staff",
+    is_active: true,
+    created_at: "2024-02-15T00:00:00.000Z",
+  },
+  {
+    id: "usr-006",
+    email: "sunil.verma@simbabeer.com",
+    first_name: "Sunil",
+    last_name: "Verma",
+    phone: "+91 98444 55667",
+    role: "staff",
+    is_active: false,
+    created_at: "2024-02-20T00:00:00.000Z",
+  },
+  {
+    id: "usr-007",
+    email: "neha.patel@simbabeer.com",
+    first_name: "Neha",
+    last_name: "Patel",
+    phone: "+91 98555 66778",
+    role: "manager",
+    is_active: true,
+    created_at: "2024-03-01T00:00:00.000Z",
+  },
+  {
+    id: "usr-008",
+    email: "deepak.gupta@simbabeer.com",
+    first_name: "Deepak",
+    last_name: "Gupta",
+    phone: "+91 98666 77889",
+    role: "staff",
+    is_active: true,
+    created_at: "2024-03-10T00:00:00.000Z",
+  },
+  {
+    id: "usr-009",
+    email: "pooja.joshi@simbabeer.com",
+    first_name: "Pooja",
+    last_name: "Joshi",
+    phone: "+91 98777 88990",
+    role: "staff",
+    is_active: true,
+    created_at: "2024-03-15T00:00:00.000Z",
+  },
+  {
+    id: "usr-010",
+    email: "rahul.nair@simbabeer.com",
+    first_name: "Rahul",
+    last_name: "Nair",
+    phone: "+91 98888 99001",
+    role: "staff",
+    is_active: false,
+    created_at: "2024-03-20T00:00:00.000Z",
+  },
+];
+
+export const DUMMY_USER_STATISTICS = {
+  totalUsers: DUMMY_USERS_LIST.length,
+  activeUsers: DUMMY_USERS_LIST.filter(u => u.is_active).length,
+  inactiveUsers: DUMMY_USERS_LIST.filter(u => !u.is_active).length,
+  byRole: {
+    super_admin: 1,
+    manager: 2,
+    staff: 7,
+  },
+};
+
+// --- DASHBOARD METRICS & CHARTS ---
+
+export const DUMMY_DASHBOARD_METRICS = {
+  totalStock: {
+    value: 28450,
+    unit: "Cases",
+    change: 14.8,
+    changeType: "increase" as const,
+    period: "last week",
+  },
+  topSku: {
+    name: "Simba Wit 330ml Can",
+    totalStock: 9840,
+    change: 18.2,
+    changeType: "increase" as const,
+  },
+  topShop: {
+    name: "Apex Liquors (Connaught Place)",
+    stockUnits: 1420,
+    stockLeft: 450,
+    dpCode: "DCCWS",
+  },
+  topLocation: {
+    name: "Central Delhi",
+    stockUnits: 8650,
+    shopCount: 28,
+  },
+};
+
+export const DUMMY_PEER_COMPARISON = [
+  { date: "18 Oct", fieldData: 4200, govReport: 3950, difference: 250, percentageDiff: 6.3 },
+  { date: "19 Oct", fieldData: 4850, govReport: 4600, difference: 250, percentageDiff: 5.4 },
+  { date: "20 Oct", fieldData: 5300, govReport: 5120, difference: 180, percentageDiff: 3.5 },
+  { date: "21 Oct", fieldData: 4900, govReport: 4750, difference: 150, percentageDiff: 3.1 },
+  { date: "22 Oct", fieldData: 5800, govReport: 5500, difference: 300, percentageDiff: 5.4 },
+  { date: "23 Oct", fieldData: 6400, govReport: 6150, difference: 250, percentageDiff: 4.0 },
+  { date: "24 Oct", fieldData: 7100, govReport: 6850, difference: 250, percentageDiff: 3.6 },
+];
+
+export const DUMMY_REPORTING_GAPS = {
+  date: "Current Week",
+  expectedReports: 140,
+  receivedReports: 132,
+  missingReports: 8,
+  missedReports: 8,
+  complianceRate: 94.3,
+};
+
+export const DUMMY_SALES_VS_CLOSING = [
+  { date: "18 Oct", month: "18 Oct", closingStock: 8200, closing: 8200, breakage: 24, govReport: 3950, fieldData: 4200, opening: 4200 },
+  { date: "19 Oct", month: "19 Oct", closingStock: 8750, closing: 8750, breakage: 18, govReport: 4600, fieldData: 4850, opening: 4850 },
+  { date: "20 Oct", month: "20 Oct", closingStock: 9100, closing: 9100, breakage: 32, govReport: 5120, fieldData: 5300, opening: 5300 },
+  { date: "21 Oct", month: "21 Oct", closingStock: 8900, closing: 8900, breakage: 15, govReport: 4750, fieldData: 4900, opening: 4900 },
+  { date: "22 Oct", month: "22 Oct", closingStock: 9600, closing: 9600, breakage: 28, govReport: 5500, fieldData: 5800, opening: 5800 },
+  { date: "23 Oct", month: "23 Oct", closingStock: 10250, closing: 10250, breakage: 22, govReport: 6150, fieldData: 6400, opening: 6400 },
+  { date: "24 Oct", month: "24 Oct", closingStock: 11100, closing: 11100, breakage: 19, govReport: 6850, fieldData: 7100, opening: 7100 },
+];
+
+export const DUMMY_TOP_PRODUCTS = [
+  { skuId: "sku-01", productName: "Simba Wit", skuName: "Simba Wit 330ml Can", sizeML: 330, salesUnits: 5420, soldUnits: 5420, totalStock: 9840, breakageUnits: 28, revenue: 1084000, growthRate: 18.5 },
+  { skuId: "sku-02", productName: "Simba Light", skuName: "Simba Light 330ml Can", sizeML: 330, salesUnits: 4180, soldUnits: 4180, totalStock: 7420, breakageUnits: 19, revenue: 836000, growthRate: 14.2 },
+  { skuId: "sku-03", productName: "Simba Stout", skuName: "Simba Stout 330ml Can", sizeML: 330, salesUnits: 3250, soldUnits: 3250, totalStock: 5210, breakageUnits: 14, revenue: 682500, growthRate: 11.8 },
+  { skuId: "sku-04", productName: "Simba Strong", skuName: "Simba Strong 650ml Bottle", sizeML: 650, salesUnits: 3890, soldUnits: 3890, totalStock: 6480, breakageUnits: 35, revenue: 894700, growthRate: 16.0 },
+  { skuId: "sku-05", productName: "Simba Roar", skuName: "Simba Roar Extra 500ml", sizeML: 500, salesUnits: 2640, soldUnits: 2640, totalStock: 4150, breakageUnits: 12, revenue: 554400, growthRate: 9.7 },
+  { skuId: "sku-06", productName: "Simba Craft IPA", skuName: "Simba Craft IPA 330ml", sizeML: 330, salesUnits: 1950, soldUnits: 1950, totalStock: 3300, breakageUnits: 8, revenue: 448500, growthRate: 22.4 },
+];
+
+export const DUMMY_TOP_SHOPS = [
+  { shopId: "shop-01", shopName: "Apex Liquors CP", dpCode: "DCCWS", stockUnits: 1420, totalBreakage: 12, growthRate: 21.4, location: "Connaught Place, Delhi" },
+  { shopId: "shop-02", shopName: "Grand Cellars Saket", dpCode: "DSCSC", stockUnits: 1280, totalBreakage: 9, growthRate: 18.2, location: "Saket, Delhi" },
+  { shopId: "shop-03", shopName: "Hauz Khas Wine Store", dpCode: "DSIIDC", stockUnits: 1150, totalBreakage: 15, growthRate: 15.6, location: "Hauz Khas, Delhi" },
+  { shopId: "shop-04", shopName: "Nehru Place Spirits", dpCode: "DTTDC", stockUnits: 980, totalBreakage: 8, growthRate: 13.9, location: "Nehru Place, Delhi" },
+  { shopId: "shop-05", shopName: "Khan Market Fine Wines", dpCode: "DCCWS", stockUnits: 920, totalBreakage: 6, growthRate: 17.5, location: "Khan Market, Delhi" },
+  { shopId: "shop-06", shopName: "Rajouri Garden Retail", dpCode: "DSIIDC", stockUnits: 860, totalBreakage: 11, growthRate: 12.1, location: "Rajouri Garden, Delhi" },
+];
+
+export const DUMMY_DEMAND_BY_SKU = [
+  { skuId: "sku-01", id: "1", productName: "Simba Wit", sku: "Simba Wit", sizeML: 330, demand: 42, value: 42, percentage: 35 },
+  { skuId: "sku-02", id: "2", productName: "Simba Light", sku: "Simba Light", sizeML: 330, demand: 28, value: 28, percentage: 24 },
+  { skuId: "sku-04", id: "3", productName: "Simba Strong", sku: "Simba Strong", sizeML: 650, demand: 24, value: 24, percentage: 20 },
+  { skuId: "sku-03", id: "4", productName: "Simba Stout", sku: "Simba Stout", sizeML: 330, demand: 15, value: 15, percentage: 13 },
+  { skuId: "sku-05", id: "5", productName: "Simba Roar", sku: "Simba Roar", sizeML: 500, demand: 11, value: 11, percentage: 8 },
+];
+
+export const DUMMY_SALES_BY_PACK_SIZE = [
+  { skuId: "pack-330", productName: "Can", skuPackSize: 330, sizeML: 330, sales: 12850, packSize: "330ml Can", units: 12850, revenue: 2698500, percentage: 45 },
+  { skuId: "pack-650", productName: "Bottle", skuPackSize: 650, sizeML: 650, sales: 7920, packSize: "650ml Bottle", units: 7920, revenue: 1821600, percentage: 28 },
+  { skuId: "pack-500", productName: "Can", skuPackSize: 500, sizeML: 500, sales: 4860, packSize: "500ml Can", units: 4860, revenue: 1020600, percentage: 17 },
+  { skuId: "pack-330-pint", productName: "Pint", skuPackSize: 330, sizeML: 330, sales: 2820, packSize: "330ml Pint", units: 2820, revenue: 592200, percentage: 10 },
+];
+
+export const DUMMY_DP_CODES_PIE_CHART = [
+  { dpCode: "DCCWS", name: "DCCWS", value: 38, count: 38, percentage: 38, shops: 18, color: "#FF4250" },
+  { dpCode: "DSCSC", name: "DSCSC", value: 27, count: 27, percentage: 27, shops: 14, color: "#FFA133" },
+  { dpCode: "DSIIDC", name: "DSIIDC", value: 21, count: 21, percentage: 21, shops: 10, color: "#2EBD85" },
+  { dpCode: "DTTDC", name: "DTTDC", value: 14, count: 14, percentage: 14, shops: 8, color: "#3B82F6" },
+];
+
+export const DUMMY_OVERALL_SALES_SPLIT = [
+  { category: "Wheat Beer (Wit)", value: 4500000, percentage: 42, growth: 18.2 },
+  { category: "Strong Beer", value: 3200000, percentage: 30, growth: 12.5 },
+  { category: "Light Lager", value: 1900000, percentage: 18, growth: 9.4 },
+  { category: "Craft Stout", value: 1100000, percentage: 10, growth: 24.1 },
+];
+
+export const DUMMY_SHOP_SALES_VS_CLOSING = [
+  { shopId: "shop-01", shopName: "Apex Liquors CP", dpCode: "DCCWS", location: "Connaught Place", openingStock: 1200, purchases: 600, sales: 520, closingStock: 1280, expectedClosing: 1280, variance: 0, variancePercentage: 0 },
+  { shopId: "shop-02", shopName: "Grand Cellars Saket", dpCode: "DSCSC", location: "Saket", openingStock: 1100, purchases: 500, sales: 460, closingStock: 1140, expectedClosing: 1140, variance: 0, variancePercentage: 0 },
+  { shopId: "shop-03", shopName: "Hauz Khas Wine Store", dpCode: "DSIIDC", location: "Hauz Khas", openingStock: 950, purchases: 450, sales: 410, closingStock: 980, expectedClosing: 990, variance: -10, variancePercentage: -1.0 },
+  { shopId: "shop-04", shopName: "Nehru Place Spirits", dpCode: "DTTDC", location: "Nehru Place", openingStock: 800, purchases: 400, sales: 380, closingStock: 820, expectedClosing: 820, variance: 0, variancePercentage: 0 },
+  { shopId: "shop-05", shopName: "Khan Market Fine Wines", dpCode: "DCCWS", location: "Khan Market", openingStock: 750, purchases: 350, sales: 310, closingStock: 790, expectedClosing: 790, variance: 0, variancePercentage: 0 },
+];
+
+// --- DAILY SALES REPORTS ---
+
+export const DUMMY_DAILY_SALES_REPORTS = [
+  {
+    id: "rep-01",
+    shopId: "shop-01",
+    storeName: "Apex Liquors (Connaught Place)",
+    uploadedBy: { name: "Rajesh Kumar", avatar: "" },
+    uploadDate: "26/10/2026",
+  },
+  {
+    id: "rep-02",
+    shopId: "shop-02",
+    storeName: "Grand Cellars (Saket)",
+    uploadedBy: { name: "Priya Singh", avatar: "" },
+    uploadDate: "26/10/2026",
+  },
+  {
+    id: "rep-03",
+    shopId: "shop-03",
+    storeName: "Hauz Khas Wine Store",
+    uploadedBy: { name: "Amit Sharma", avatar: "" },
+    uploadDate: "25/10/2026",
+  },
+  {
+    id: "rep-04",
+    shopId: "shop-04",
+    storeName: "Nehru Place Spirits",
+    uploadedBy: { name: "Rajesh Kumar", avatar: "" },
+    uploadDate: "25/10/2026",
+  },
+  {
+    id: "rep-05",
+    shopId: "shop-05",
+    storeName: "Khan Market Fine Wines",
+    uploadedBy: { name: "Vikram Malhotra", avatar: "" },
+    uploadDate: "24/10/2026",
+  },
+  {
+    id: "rep-06",
+    shopId: "shop-06",
+    storeName: "Rajouri Garden Retail",
+    uploadedBy: { name: "Priya Singh", avatar: "" },
+    uploadDate: "24/10/2026",
+  },
+];
+
+export const DUMMY_DETAILED_DAILY_REPORT = {
+  success: true,
+  data: {
+    meta: {
+      reportDate: "26/10/2026",
+      storeName: "Apex Liquors",
+      shopId: "shop-01",
+    },
+    rows: [
+      { skuId: "sku-01", segment: "Simba Wit", category: "Craft Beer", size: "330ml Can", sales: 48, closing: 142, availability: true, breakage: 2, demand: 52 },
+      { skuId: "sku-02", segment: "Simba Light", category: "Lager", size: "330ml Can", sales: 36, closing: 118, availability: true, breakage: 1, demand: 38 },
+      { skuId: "sku-03", segment: "Simba Stout", category: "Craft Beer", size: "330ml Can", sales: 24, closing: 84, availability: true, breakage: 0, demand: 26 },
+      { skuId: "sku-04", segment: "Simba Strong", category: "Strong", size: "650ml Bottle", sales: 42, closing: 96, availability: true, breakage: 3, demand: 45 },
+      { skuId: "sku-05", segment: "Simba Roar", category: "Strong", size: "500ml Can", sales: 18, closing: 62, availability: true, breakage: 0, demand: 20 },
+    ],
+  },
+};
+
+// --- SALES ANALYTICS & STAFF P&L ---
+
+export const DUMMY_SALES_METRICS = {
+  totalRevenue: 3450000,
+  totalSales: 16800,
+  totalOrders: 940,
+  averageOrderValue: 3670,
+  revenueGrowth: 15.4,
+  salesGrowth: 12.8,
+  growthRate: 15.4,
+  salesTrend: "increasing" as const,
+  topPerformingCategory: "Wheat Beer (Wit)",
+  topProducts: [
+    { id: "sku-01", name: "Simba Wit 330ml", revenue: 1084000, quantity: 5420 },
+    { id: "sku-02", name: "Simba Light 330ml", revenue: 836000, quantity: 4180 },
+    { id: "sku-04", name: "Simba Strong 650ml", revenue: 894700, quantity: 3890 },
+    { id: "sku-03", name: "Simba Stout 330ml", revenue: 682500, quantity: 3250 },
+  ],
+  topCategories: [
+    { category: "Craft / Wit Beer", revenue: 1766500, percentage: 51 },
+    { category: "Strong Beer", revenue: 1024500, percentage: 30 },
+    { category: "Lager Beer", revenue: 659000, percentage: 19 },
+  ],
+  topShops: [
+    { id: "shop-01", name: "Apex Liquors CP", revenue: 620000, salesCount: 2840 },
+    { id: "shop-02", name: "Grand Cellars Saket", revenue: 540000, salesCount: 2410 },
+    { id: "shop-03", name: "Hauz Khas Wine Store", revenue: 480000, salesCount: 2120 },
+    { id: "shop-04", name: "Nehru Place Spirits", revenue: 410000, salesCount: 1850 },
+  ],
+  period: {
+    start: "2026-10-01",
+    end: "2026-10-26",
+  },
+};
+
+export const DUMMY_SALES_BY_PERIOD = [
+  { period: "Week 1", sales: 3800, revenue: 760000, orders: 210, growth: 10.2 },
+  { period: "Week 2", sales: 4200, revenue: 840000, orders: 235, growth: 10.5 },
+  { period: "Week 3", sales: 4600, revenue: 920000, orders: 255, growth: 9.5 },
+  { period: "Week 4", sales: 5100, revenue: 1020000, orders: 280, growth: 10.8 },
+];
+
+export const DUMMY_SALES_BY_CATEGORY = [
+  { category: "Craft & Wit", sales: 7420, revenue: 1558200, percentage: 44, growth: 18.2 },
+  { category: "Strong Beer", sales: 5240, revenue: 1205200, percentage: 31, growth: 14.1 },
+  { category: "Lager & Light", sales: 4140, revenue: 828000, percentage: 25, growth: 8.5 },
+];
+
+export const DUMMY_STAFF_PERSONS = [
+  { id: "staff-01", name: "Rajesh Kumar", email: "rajesh@simbabeer.com", activeShops: 12, totalSales: 4820, targetAchievement: 108 },
+  { id: "staff-02", name: "Priya Singh", email: "priya@simbabeer.com", activeShops: 10, totalSales: 4250, targetAchievement: 102 },
+  { id: "staff-03", name: "Amit Sharma", email: "amit@simbabeer.com", activeShops: 9, totalSales: 3890, targetAchievement: 96 },
+  { id: "staff-04", name: "Vikram Malhotra", email: "vikram@simbabeer.com", activeShops: 8, totalSales: 3410, targetAchievement: 92 },
+  { id: "staff-05", name: "Deepak Verma", email: "deepak@simbabeer.com", activeShops: 7, totalSales: 2980, targetAchievement: 89 },
+];
+
+export const DUMMY_STAFF_OVERVIEW = {
+  success: true,
+  data: {
+    totalSales: 19350,
+    totalShops: 46,
+    avgSalesPerStaff: 3870,
+    targetAchievementRate: 97.4,
+    topPerformer: "Rajesh Kumar",
+  },
+};
+
+export const DUMMY_MARKET_SHARE = {
+  success: true,
+  data: {
+    overview: {
+      buckets: [
+        { name: "Simba Beer", share: 34.2, volume: 18500, color: "#FF4250" },
+        { name: "Competitor A", share: 28.5, volume: 15400, color: "#3B82F6" },
+        { name: "Competitor B", share: 22.1, volume: 11950, color: "#FFA133" },
+        { name: "Others", share: 15.2, volume: 8230, color: "#64748B" },
+      ],
+      totalMarketVolume: 54080,
+      simbaShare: 34.2,
+    },
+    shopSummary: [
+      { id: "shop-01", shopName: "Apex Liquors CP", dpCode: "DCCWS", totalBeerSales: 4200, simbaSales: 1680, marketShare: 40.0, trend: "+3.2%" },
+      { id: "shop-02", shopName: "Grand Cellars Saket", dpCode: "DSCSC", totalBeerSales: 3800, simbaSales: 1368, marketShare: 36.0, trend: "+2.5%" },
+      { id: "shop-03", shopName: "Hauz Khas Wine Store", dpCode: "DSIIDC", totalBeerSales: 3400, simbaSales: 1156, marketShare: 34.0, trend: "+1.8%" },
+      { id: "shop-04", shopName: "Nehru Place Spirits", dpCode: "DTTDC", totalBeerSales: 2900, simbaSales: 928, marketShare: 32.0, trend: "+0.9%" },
+      { id: "shop-05", shopName: "Khan Market Fine Wines", dpCode: "DCCWS", totalBeerSales: 2600, simbaSales: 884, marketShare: 34.0, trend: "+2.1%" },
+    ],
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+      totalItems: 5,
+    },
+  },
+};
+
+// --- HEATMAP & LOCATION ANALYTICS ---
+
+export const DUMMY_HEATMAP_DATA = [
+  {
+    region: "North",
+    state: "Delhi",
+    district: "Central Delhi",
+    shopId: "shop-01",
+    shopName: "Apex Liquors CP",
+    dpCode: "DCCWS",
+    coordinates: { lat: 28.6315, lng: 77.2167 },
+    metrics: { salesVolume: 5420, marketPenetration: 0.88, shopCount: 14, averagePerformance: 387, growthRate: 0.18 },
+    intensity: 0.92,
+    color: "#FF4250",
+  },
+  {
+    region: "South",
+    state: "Delhi",
+    district: "South Delhi",
+    shopId: "shop-02",
+    shopName: "Grand Cellars Saket",
+    dpCode: "DSCSC",
+    coordinates: { lat: 28.5244, lng: 77.2167 },
+    metrics: { salesVolume: 4890, marketPenetration: 0.82, shopCount: 12, averagePerformance: 407, growthRate: 0.15 },
+    intensity: 0.84,
+    color: "#FFA133",
+  },
+  {
+    region: "South",
+    state: "Delhi",
+    district: "Hauz Khas",
+    shopId: "shop-03",
+    shopName: "Hauz Khas Wine Store",
+    dpCode: "DSIIDC",
+    coordinates: { lat: 28.5494, lng: 77.2001 },
+    metrics: { salesVolume: 3950, marketPenetration: 0.75, shopCount: 9, averagePerformance: 438, growthRate: 0.12 },
+    intensity: 0.74,
+    color: "#2EBD85",
+  },
+  {
+    region: "East",
+    state: "Delhi",
+    district: "East Delhi",
+    shopId: "shop-04",
+    shopName: "Nehru Place Spirits",
+    dpCode: "DTTDC",
+    coordinates: { lat: 28.5492, lng: 77.2514 },
+    metrics: { salesVolume: 3410, marketPenetration: 0.68, shopCount: 8, averagePerformance: 426, growthRate: 0.11 },
+    intensity: 0.65,
+    color: "#3B82F6",
+  },
+  {
+    region: "West",
+    state: "Delhi",
+    district: "West Delhi",
+    shopId: "shop-06",
+    shopName: "Rajouri Garden Retail",
+    dpCode: "DSIIDC",
+    coordinates: { lat: 28.6415, lng: 77.1209 },
+    metrics: { salesVolume: 2980, marketPenetration: 0.62, shopCount: 7, averagePerformance: 425, growthRate: 0.09 },
+    intensity: 0.58,
+    color: "#8B5CF6",
+  },
+];
+
+export const DUMMY_LOCATION_SUMMARY = {
+  totalStates: 1,
+  totalDistricts: 5,
+  totalShops: 50,
+  averageSales: 4130,
+  topPerformingLocation: "Central Delhi",
+  worstPerformingLocation: "West Delhi",
+};
+
+export const DUMMY_LOCATION_TRENDS = [
+  { date: "18 Oct", salesVolume: 3800, growthRate: 0.08 },
+  { date: "19 Oct", salesVolume: 4100, growthRate: 0.10 },
+  { date: "20 Oct", salesVolume: 4350, growthRate: 0.12 },
+  { date: "21 Oct", salesVolume: 4200, growthRate: 0.09 },
+  { date: "22 Oct", salesVolume: 4750, growthRate: 0.14 },
+  { date: "23 Oct", salesVolume: 5100, growthRate: 0.16 },
+  { date: "24 Oct", salesVolume: 5450, growthRate: 0.18 },
+];
+
+// --- BREAKAGE REPORTS ---
+
+export const DUMMY_BREAKAGE_STATISTICS = {
+  totalBreakages: 116,
+  totalValue: 24360,
+  averageValue: 210,
+  breakageRate: 0.68,
+  trend: "decreasing" as const,
+  periodStart: "2026-10-01",
+  periodEnd: "2026-10-26",
+  topCauses: [
+    { cause: "Handling Transit", count: 54, percentage: 46.5 },
+    { cause: "Storage Damage", count: 38, percentage: 32.8 },
+    { cause: "Display Mishap", count: 24, percentage: 20.7 },
+  ],
+  bySeverity: {
+    high: 14,
+    medium: 42,
+    low: 60,
+  },
+};
+
+export const DUMMY_BREAKAGE_BY_SHOP = [
+  { shopId: "shop-01", shopName: "Apex Liquors CP", dpCode: "DCCWS", location: "Connaught Place", breakageCount: 28, breakageValue: 5880, breakagePercentage: 24.1, averageBreakageValue: 210, mostBrokenSKU: "Simba Strong 650ml", topBreakageReasons: ["Handling Transit", "Storage Damage"], trend: "decreasing" as const },
+  { shopId: "shop-02", shopName: "Grand Cellars Saket", dpCode: "DSCSC", location: "Saket", breakageCount: 22, breakageValue: 4620, breakagePercentage: 19.0, averageBreakageValue: 210, mostBrokenSKU: "Simba Strong 650ml", topBreakageReasons: ["Display Mishap"], trend: "stable" as const },
+  { shopId: "shop-03", shopName: "Hauz Khas Wine Store", dpCode: "DSIIDC", location: "Hauz Khas", breakageCount: 19, breakageValue: 3990, breakagePercentage: 16.4, averageBreakageValue: 210, mostBrokenSKU: "Simba Wit 330ml", topBreakageReasons: ["Transit Vibration"], trend: "decreasing" as const },
+  { shopId: "shop-04", shopName: "Nehru Place Spirits", dpCode: "DTTDC", location: "Nehru Place", breakageCount: 16, breakageValue: 3360, breakagePercentage: 13.8, averageBreakageValue: 210, mostBrokenSKU: "Simba Light 330ml", topBreakageReasons: ["Storage Stacking"], trend: "stable" as const },
+  { shopId: "shop-05", shopName: "Khan Market Fine Wines", dpCode: "DCCWS", location: "Khan Market", breakageCount: 14, breakageValue: 2940, breakagePercentage: 12.1, averageBreakageValue: 210, mostBrokenSKU: "Simba Stout 330ml", topBreakageReasons: ["Unloading Slip"], trend: "decreasing" as const },
+  { shopId: "shop-06", shopName: "Rajouri Garden Retail", dpCode: "DSIIDC", location: "Rajouri Garden", breakageCount: 17, breakageValue: 3570, breakagePercentage: 14.6, averageBreakageValue: 210, mostBrokenSKU: "Simba Strong 650ml", topBreakageReasons: ["Crate Shift"], trend: "increasing" as const },
+];
+
+export const DUMMY_BREAKAGE_BY_SKU = [
+  { skuId: "sku-04", skuName: "Simba Strong 650ml Bottle", productName: "Simba Strong", brandName: "Simba Strong", category: "Beer", sizeML: 650, breakageCount: 48, breakageValue: 11040, breakageRate: 1.2, breakagePercentage: 45.3, averageBreakageValue: 230, affectedShops: 6, topBreakageReasons: ["Transit Vibration", "Bottle Crack"], lastBreakageDate: "2026-10-25", riskLevel: "high" as const },
+  { skuId: "sku-01", skuName: "Simba Wit 330ml Can", productName: "Simba Wit", brandName: "Simba Wit", category: "Beer", sizeML: 330, breakageCount: 28, breakageValue: 5600, breakageRate: 0.5, breakagePercentage: 23.0, averageBreakageValue: 200, affectedShops: 5, topBreakageReasons: ["Can Puncture", "Handling Drop"], lastBreakageDate: "2026-10-24", riskLevel: "medium" as const },
+  { skuId: "sku-02", skuName: "Simba Light 330ml Can", productName: "Simba Light", brandName: "Simba Light", category: "Beer", sizeML: 330, breakageCount: 19, breakageValue: 3800, breakageRate: 0.4, breakagePercentage: 15.6, averageBreakageValue: 200, affectedShops: 4, topBreakageReasons: ["Storage Compression"], lastBreakageDate: "2026-10-23", riskLevel: "low" as const },
+  { skuId: "sku-03", skuName: "Simba Stout 330ml Can", productName: "Simba Stout", brandName: "Simba Stout", category: "Beer", sizeML: 330, breakageCount: 14, breakageValue: 2940, breakageRate: 0.4, breakagePercentage: 12.1, averageBreakageValue: 210, affectedShops: 3, topBreakageReasons: ["Handling Drop"], lastBreakageDate: "2026-10-22", riskLevel: "low" as const },
+  { skuId: "sku-05", skuName: "Simba Roar 500ml", productName: "Simba Roar", brandName: "Simba Roar", category: "Beer", sizeML: 500, breakageCount: 7, breakageValue: 980, breakageRate: 0.2, breakagePercentage: 4.0, averageBreakageValue: 140, affectedShops: 2, topBreakageReasons: ["Transit Shift"], lastBreakageDate: "2026-10-21", riskLevel: "low" as const },
+];
+
+export const DUMMY_BREAKAGE_TRENDS = [
+  { date: "18 Oct", breakageCount: 24, breakageValue: 5040, rate: 0.8 },
+  { date: "19 Oct", breakageCount: 18, breakageValue: 3780, rate: 0.6 },
+  { date: "20 Oct", breakageCount: 22, breakageValue: 4620, rate: 0.7 },
+  { date: "21 Oct", breakageCount: 15, breakageValue: 3150, rate: 0.5 },
+  { date: "22 Oct", breakageCount: 19, breakageValue: 3990, rate: 0.6 },
+  { date: "23 Oct", breakageCount: 12, breakageValue: 2520, rate: 0.4 },
+  { date: "24 Oct", breakageCount: 6, breakageValue: 1260, rate: 0.2 },
+];
+
+// --- CRITICAL ISSUES & RISK ALERTS ---
+
+export const DUMMY_CRITICAL_ISSUES = [
+  {
+    id: "crit-01",
+    title: "Low Stock Alert: Simba Wit 330ml",
+    risk: "High Stockout Risk",
+    description: "Apex Liquors has only 8 cases remaining, projected to run out within 24 hours.",
+    time: "2 hours ago",
+    level: 1 as const,
+    shopId: "shop-01",
+    skuId: "sku-01",
+    location: "Connaught Place, Delhi",
+    severity: "high" as const,
+    category: "stock",
+    daysStuck: 0,
+    closingStock: 8,
+    salesLast30Days: 450,
+    createdAt: "2026-10-26T10:00:00Z",
+    updatedAt: "2026-10-26T10:00:00Z",
+  },
+  {
+    id: "crit-02",
+    title: "Elevated Breakage Rate",
+    risk: "Loss Hotspot",
+    description: "Grand Cellars Saket reported 12 broken 650ml bottles during morning restocking.",
+    time: "4 hours ago",
+    level: 2 as const,
+    shopId: "shop-02",
+    skuId: "sku-04",
+    location: "Saket, Delhi",
+    severity: "medium" as const,
+    category: "compliance",
+    daysStuck: 0,
+    closingStock: 140,
+    salesLast30Days: 380,
+    createdAt: "2026-10-26T08:00:00Z",
+    updatedAt: "2026-10-26T08:00:00Z",
+  },
+  {
+    id: "crit-03",
+    title: "Missing Daily Stock Report",
+    risk: "Reporting Gap",
+    description: "Hauz Khas Wine Store daily report pending for over 36 hours.",
+    time: "6 hours ago",
+    level: 2 as const,
+    shopId: "shop-03",
+    skuId: "sku-02",
+    location: "Hauz Khas, Delhi",
+    severity: "medium" as const,
+    category: "compliance",
+    daysStuck: 2,
+    closingStock: 65,
+    salesLast30Days: 290,
+    createdAt: "2026-10-26T06:00:00Z",
+    updatedAt: "2026-10-26T06:00:00Z",
+  },
+  {
+    id: "crit-04",
+    title: "Slow Moving Inventory",
+    risk: "Stuck Stock",
+    description: "Simba Stout 330ml showing less than 5 units daily sales at Nehru Place Spirits.",
+    time: "1 day ago",
+    level: 3 as const,
+    shopId: "shop-04",
+    skuId: "sku-03",
+    location: "Nehru Place, Delhi",
+    severity: "low" as const,
+    category: "performance",
+    daysStuck: 14,
+    closingStock: 120,
+    salesLast30Days: 42,
+    createdAt: "2026-10-25T12:00:00Z",
+    updatedAt: "2026-10-25T12:00:00Z",
+  },
+];
+
+export const DUMMY_CRITICAL_METRICS = {
+  highSeverityCount: 1,
+  mediumSeverityCount: 2,
+  lowSeverityCount: 1,
+  totalIssues: 4,
+  resolvedToday: 6,
+};
+
+// --- AI PERFORMANCE & OCR ---
+
+export const DUMMY_AI_DASHBOARD = {
+  accuracy: { overall: 96.8, ocr: 98.2, fuzzyMatching: 95.4 },
+  processingTime: { average: 1.8, p95: 3.2, unit: "seconds" },
+  confidenceScore: 94.6,
+  dailyProcessedFiles: 42,
+  autoApprovalRate: 88.5,
+  reviewQueueCount: 5,
+};
+
+export const DUMMY_UPLOAD_SESSIONS = [
+  {
+    id: "sess-01",
+    filename: "delhi_excise_daily_2610.xlsx",
+    file_size: 245000,
+    file_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    uploaded_by: "Rajesh Kumar",
+    processing_status: "completed",
+    ai_confidence_score: 98.5,
+    ai_routing_decision: "auto_approved",
+    file_url: "/dummy/delhi_excise_daily_2610.xlsx",
+    created_at: "2026-10-26T09:30:00Z",
+  },
+  {
+    id: "sess-02",
+    filename: "saket_shop_report_scan.pdf",
+    file_size: 1120000,
+    file_type: "application/pdf",
+    uploaded_by: "Priya Singh",
+    processing_status: "completed",
+    ai_confidence_score: 94.2,
+    ai_routing_decision: "auto_approved",
+    file_url: "/dummy/saket_shop_report_scan.pdf",
+    created_at: "2026-10-26T10:15:00Z",
+  },
+  {
+    id: "sess-03",
+    filename: "cp_weekly_invoice_oct.pdf",
+    file_size: 890000,
+    file_type: "application/pdf",
+    uploaded_by: "Amit Sharma",
+    processing_status: "review_pending",
+    ai_confidence_score: 82.0,
+    ai_routing_decision: "review_queue",
+    file_url: "/dummy/cp_weekly_invoice_oct.pdf",
+    created_at: "2026-10-26T11:00:00Z",
+  },
+  {
+    id: "sess-04",
+    filename: "dccws_stock_ledger.xlsx",
+    file_size: 320000,
+    file_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    uploaded_by: "Vikram Malhotra",
+    processing_status: "completed",
+    ai_confidence_score: 97.8,
+    ai_routing_decision: "auto_approved",
+    file_url: "/dummy/dccws_stock_ledger.xlsx",
+    created_at: "2026-10-25T14:20:00Z",
+  },
+];
+
+export const DUMMY_OCR_REVIEW_DATA = {
+  sessionId: "sess-03",
+  filename: "cp_weekly_invoice_oct.pdf",
+  confidence: 82.0,
+  extractedItems: [
+    { id: "item-1", rawText: "SIMBA WIT CAN 330ML", matchedSku: "Simba Wit 330ml Can", confidence: 96, quantity: 45, unitPrice: 200 },
+    { id: "item-2", rawText: "SIMBA LT 330ML", matchedSku: "Simba Light 330ml Can", confidence: 92, quantity: 30, unitPrice: 200 },
+    { id: "item-3", rawText: "SIMBA STOUT", matchedSku: "Simba Stout 330ml Can", confidence: 85, quantity: 20, unitPrice: 210 },
+    { id: "item-4", rawText: "SIMBA ROAR EXT 500", matchedSku: "Simba Roar Extra 500ml", confidence: 88, quantity: 15, unitPrice: 210 },
+  ],
+};
+
+// --- SHOPS & SKUS MASTER DATA ---
+
+export const DUMMY_SHOPS = [
+  {
+    id: "shop-01",
+    shop_name: "Apex Liquors (Connaught Place)",
+    name: "Apex Liquors (Connaught Place)",
+    dp_code: "DCCWS",
+    original_dp_code: "DCCWS-01",
+    state: "Delhi",
+    district: "Central Delhi",
+    address: "Block B, Connaught Place, New Delhi",
+    contact_info: { phone: "+91 11 2341 5678", manager: "Suresh Gupta" },
+    is_active: true,
+    last_visit_date: "26/10/2026",
+    vendor_code: "VEND-101",
+  },
+  {
+    id: "shop-02",
+    shop_name: "Grand Cellars (Saket)",
+    name: "Grand Cellars (Saket)",
+    dp_code: "DSCSC",
+    original_dp_code: "DSCSC-02",
+    state: "Delhi",
+    district: "South Delhi",
+    address: "Select Citywalk, Saket District Centre, New Delhi",
+    contact_info: { phone: "+91 11 4102 3344", manager: "Ramesh Sen" },
+    is_active: true,
+    last_visit_date: "26/10/2026",
+    vendor_code: "VEND-102",
+  },
+  {
+    id: "shop-03",
+    shop_name: "Hauz Khas Wine Store",
+    name: "Hauz Khas Wine Store",
+    dp_code: "DSIIDC",
+    original_dp_code: "DSIIDC-03",
+    state: "Delhi",
+    district: "Hauz Khas",
+    address: "Aurobindo Marg, Hauz Khas, New Delhi",
+    contact_info: { phone: "+91 11 2656 7890", manager: "Karan Johar" },
+    is_active: true,
+    last_visit_date: "25/10/2026",
+    vendor_code: "VEND-103",
+  },
+  {
+    id: "shop-04",
+    shop_name: "Nehru Place Spirits",
+    name: "Nehru Place Spirits",
+    dp_code: "DTTDC",
+    original_dp_code: "DTTDC-04",
+    state: "Delhi",
+    district: "East Delhi",
+    address: "Eros Commercial Complex, Nehru Place, New Delhi",
+    contact_info: { phone: "+91 11 2644 1122", manager: "Manoj Joshi" },
+    is_active: true,
+    last_visit_date: "25/10/2026",
+    vendor_code: "VEND-104",
+  },
+  {
+    id: "shop-05",
+    shop_name: "Khan Market Fine Wines",
+    name: "Khan Market Fine Wines",
+    dp_code: "DCCWS",
+    original_dp_code: "DCCWS-05",
+    state: "Delhi",
+    district: "Central Delhi",
+    address: "Middle Lane, Khan Market, New Delhi",
+    contact_info: { phone: "+91 11 2461 9988", manager: "Ashok Mittal" },
+    is_active: true,
+    last_visit_date: "24/10/2026",
+    vendor_code: "VEND-105",
+  },
+  {
+    id: "shop-06",
+    shop_name: "Rajouri Garden Retail",
+    name: "Rajouri Garden Retail",
+    dp_code: "DSIIDC",
+    original_dp_code: "DSIIDC-06",
+    state: "Delhi",
+    district: "West Delhi",
+    address: "Main Market, Rajouri Garden, New Delhi",
+    contact_info: { phone: "+91 11 2511 4455", manager: "Praveen Kapoor" },
+    is_active: true,
+    last_visit_date: "24/10/2026",
+    vendor_code: "VEND-106",
+  },
+];
+
+export const DUMMY_SKUS = [
+  {
+    id: "sku-01",
+    brand_name: "Simba Wit",
+    category: "Craft Beer",
+    size_ml: 330,
+    mrp: 200,
+    is_active: true,
+    name: "Simba Wit 330ml Can",
+    brandCode: "SIM-WIT-330",
+    stockQuantity: 142,
+  },
+  {
+    id: "sku-02",
+    brand_name: "Simba Light",
+    category: "Lager",
+    size_ml: 330,
+    mrp: 200,
+    is_active: true,
+    name: "Simba Light 330ml Can",
+    brandCode: "SIM-LGT-330",
+    stockQuantity: 118,
+  },
+  {
+    id: "sku-03",
+    brand_name: "Simba Stout",
+    category: "Craft Beer",
+    size_ml: 330,
+    mrp: 210,
+    is_active: true,
+    name: "Simba Stout 330ml Can",
+    brandCode: "SIM-STT-330",
+    stockQuantity: 84,
+  },
+  {
+    id: "sku-04",
+    brand_name: "Simba Strong",
+    category: "Strong Beer",
+    size_ml: 650,
+    mrp: 230,
+    is_active: true,
+    name: "Simba Strong 650ml Bottle",
+    brandCode: "SIM-STR-650",
+    stockQuantity: 96,
+  },
+  {
+    id: "sku-05",
+    brand_name: "Simba Roar Extra",
+    category: "Strong Beer",
+    size_ml: 500,
+    mrp: 210,
+    is_active: true,
+    name: "Simba Roar Extra 500ml",
+    brandCode: "SIM-ROAR-500",
+    stockQuantity: 62,
+  },
+  {
+    id: "sku-06",
+    brand_name: "Simba Craft IPA",
+    category: "Craft Beer",
+    size_ml: 330,
+    mrp: 230,
+    is_active: true,
+    name: "Simba Craft IPA 330ml",
+    brandCode: "SIM-IPA-330",
+    stockQuantity: 45,
+  },
+];
+
+// --- SELLER / STAFF PROFILE DATA ---
+
+export const DUMMY_SELLER_PROFILE = {
+  headerCounts: {
+    todays_skus: 28,
+    weekly_skus: 145,
+  },
+  recentVisit: [
+    {
+      id: "shop-01",
+      shop_name: "Apex Liquors (Connaught Place)",
+      dp_code: "DCCWS",
+      state: "Delhi",
+      district: "Central Delhi",
+      address: "Block B, Connaught Place, New Delhi",
+      contact_info: "+91 11 2341 5678",
+      last_visit_date: "26/10/2026",
+      visit_count: 14,
+    },
+    {
+      id: "shop-02",
+      shop_name: "Grand Cellars (Saket)",
+      dp_code: "DSCSC",
+      state: "Delhi",
+      district: "South Delhi",
+      address: "Select Citywalk, Saket District Centre",
+      contact_info: "+91 11 4102 3344",
+      last_visit_date: "26/10/2026",
+      visit_count: 12,
+    },
+    {
+      id: "shop-03",
+      shop_name: "Hauz Khas Wine Store",
+      dp_code: "DSIIDC",
+      state: "Delhi",
+      district: "Hauz Khas",
+      address: "Aurobindo Marg, Hauz Khas",
+      contact_info: "+91 11 2656 7890",
+      last_visit_date: "25/10/2026",
+      visit_count: 9,
+    },
+    {
+      id: "shop-04",
+      shop_name: "Nehru Place Spirits",
+      dp_code: "DTTDC",
+      state: "Delhi",
+      district: "East Delhi",
+      address: "Eros Commercial Complex, Nehru Place",
+      contact_info: "+91 11 2644 1122",
+      last_visit_date: "25/10/2026",
+      visit_count: 8,
+    },
+  ],
+};
+
+export const DUMMY_SHOP_DETAIL = {
+  header: {
+    id: "shop-01",
+    shop_name: "Apex Liquors (Connaught Place)",
+    dp_code: "DCCWS",
+    state: "Delhi",
+    district: "Central Delhi",
+    address: "Block B, Connaught Place, New Delhi",
+    contact_info: "+91 11 2341 5678",
+    last_visit_date: "26/10/2026",
+    last_visit_formatted: "Today, 10:30 AM",
+    is_active: true,
+  },
+  stockDetails: {
+    in_stock: 450,
+    low_stock: 35,
+    out_of_stock: 0,
+  },
+  productCategories: [
+    { name: "Craft & Wit", count: 180, image: "" },
+    { name: "Strong Beer", count: 160, image: "" },
+    { name: "Lager & Light", count: 110, image: "" },
+  ],
+};
+
+export const DUMMY_PRODUCT_PAGE_DATA = {
+  shop: {
+    id: "shop-01",
+    name: "Apex Liquors (Connaught Place)",
+    dp_code: "DCCWS",
+  },
+  category: {
+    slug: "craft-beer",
+    displayName: "Craft Beer",
+    databaseCategory: "Craft Beer",
+  },
+  product: [
+    {
+      id: "prod-01",
+      brandName: "Simba Wit",
+      productName: "Simba Wit 330ml Can",
+      sizeMl: 330,
+      mrp: 200,
+      category: "Craft Beer",
+      brandCode: "SIM-WIT-330",
+      stockQuantity: 142,
+      lastReportDate: "26/10/2026",
+      displayName: "Simba Wit 330ml Can",
+    },
+    {
+      id: "prod-02",
+      brandName: "Simba Stout",
+      productName: "Simba Stout 330ml Can",
+      sizeMl: 330,
+      mrp: 210,
+      category: "Craft Beer",
+      brandCode: "SIM-STT-330",
+      stockQuantity: 84,
+      lastReportDate: "26/10/2026",
+      displayName: "Simba Stout 330ml Can",
+    },
+    {
+      id: "prod-03",
+      brandName: "Simba Craft IPA",
+      productName: "Simba Craft IPA 330ml",
+      sizeMl: 330,
+      mrp: 230,
+      category: "Craft Beer",
+      brandCode: "SIM-IPA-330",
+      stockQuantity: 45,
+      lastReportDate: "26/10/2026",
+      displayName: "Simba Craft IPA 330ml",
+    },
+  ],
+};
+
+// --- SHOP-WISE CLOSING STOCK HEATMAP DUMMY DATA ---
+
+export const DUMMY_SHOP_BRAND_STOCK = [
+  {
+    shopName: "Apex Liquors (Connaught Place)",
+    shopId: "shop-01",
+    location: "Connaught Place, Delhi",
+    dpCode: "DCCWS",
+    brands: {
+      "Simba Wit": { closingStock: 142, stockLevel: "Healthy" as const },
+      "Simba Light": { closingStock: 118, stockLevel: "Healthy" as const },
+      "Simba Stout": { closingStock: 84, stockLevel: "Medium" as const },
+      "Simba Strong": { closingStock: 96, stockLevel: "Healthy" as const },
+      "Simba Roar": { closingStock: 45, stockLevel: "Low" as const },
+      "Simba Craft IPA": { closingStock: 0, stockLevel: "Low" as const },
+    },
+  },
+  {
+    shopName: "Grand Cellars Saket",
+    shopId: "shop-02",
+    location: "Saket, Delhi",
+    dpCode: "DSCSC",
+    brands: {
+      "Simba Wit": { closingStock: 125, stockLevel: "Healthy" as const },
+      "Simba Light": { closingStock: 95, stockLevel: "Healthy" as const },
+      "Simba Stout": { closingStock: 60, stockLevel: "Medium" as const },
+      "Simba Strong": { closingStock: 110, stockLevel: "Healthy" as const },
+      "Simba Roar": { closingStock: 0, stockLevel: "Low" as const },
+      "Simba Craft IPA": { closingStock: 35, stockLevel: "Low" as const },
+    },
+  },
+  {
+    shopName: "Hauz Khas Wine Store",
+    shopId: "shop-03",
+    location: "Hauz Khas, Delhi",
+    dpCode: "DSIIDC",
+    brands: {
+      "Simba Wit": { closingStock: 110, stockLevel: "Healthy" as const },
+      "Simba Light": { closingStock: 82, stockLevel: "Healthy" as const },
+      "Simba Stout": { closingStock: 48, stockLevel: "Medium" as const },
+      "Simba Strong": { closingStock: 88, stockLevel: "Healthy" as const },
+      "Simba Roar": { closingStock: 30, stockLevel: "Low" as const },
+      "Simba Craft IPA": { closingStock: 25, stockLevel: "Low" as const },
+    },
+  },
+  {
+    shopName: "Nehru Place Spirits",
+    shopId: "shop-04",
+    location: "Nehru Place, Delhi",
+    dpCode: "DTTDC",
+    brands: {
+      "Simba Wit": { closingStock: 95, stockLevel: "Healthy" as const },
+      "Simba Light": { closingStock: 70, stockLevel: "Healthy" as const },
+      "Simba Stout": { closingStock: 0, stockLevel: "Low" as const },
+      "Simba Strong": { closingStock: 75, stockLevel: "Healthy" as const },
+      "Simba Roar": { closingStock: 22, stockLevel: "Low" as const },
+      "Simba Craft IPA": { closingStock: 18, stockLevel: "Low" as const },
+    },
+  },
+  {
+    shopName: "Khan Market Fine Wines",
+    shopId: "shop-05",
+    location: "Khan Market, Delhi",
+    dpCode: "DCCWS",
+    brands: {
+      "Simba Wit": { closingStock: 130, stockLevel: "Healthy" as const },
+      "Simba Light": { closingStock: 105, stockLevel: "Healthy" as const },
+      "Simba Stout": { closingStock: 72, stockLevel: "Medium" as const },
+      "Simba Strong": { closingStock: 90, stockLevel: "Healthy" as const },
+      "Simba Roar": { closingStock: 40, stockLevel: "Medium" as const },
+      "Simba Craft IPA": { closingStock: 50, stockLevel: "Medium" as const },
+    },
+  },
+  {
+    shopName: "Rajouri Garden Retail",
+    shopId: "shop-06",
+    location: "Rajouri Garden, Delhi",
+    dpCode: "DSIIDC",
+    brands: {
+      "Simba Wit": { closingStock: 88, stockLevel: "Healthy" as const },
+      "Simba Light": { closingStock: 64, stockLevel: "Medium" as const },
+      "Simba Stout": { closingStock: 42, stockLevel: "Medium" as const },
+      "Simba Strong": { closingStock: 78, stockLevel: "Healthy" as const },
+      "Simba Roar": { closingStock: 0, stockLevel: "Low" as const },
+      "Simba Craft IPA": { closingStock: 15, stockLevel: "Low" as const },
+    },
+  },
+];
+
+export const DUMMY_SHOP_BRAND_STOCK_RESPONSE = {
+  success: true,
+  data: DUMMY_SHOP_BRAND_STOCK,
+  totalShops: DUMMY_SHOP_BRAND_STOCK.length,
+  total_instock: 485,
+  total_outstock: 4,
+  metadata: {
+    total_outstock: 4,
+    dateRange: {
+      start: "2026-09-26",
+      end: "2026-10-26",
+    },
+  },
+};
+
+// --- DEMAND ANALYTICS TABLE DUMMY DATA ---
+
+export const DUMMY_DEMAND_TABLE_DATA = {
+  filters: {
+    products: [
+      { value: "all", label: "All Products" },
+      { value: "Simba Wit", label: "Simba Wit" },
+      { value: "Simba Light", label: "Simba Light" },
+      { value: "Simba Stout", label: "Simba Stout" },
+      { value: "Simba Strong", label: "Simba Strong" },
+      { value: "Simba Roar", label: "Simba Roar" },
+    ],
+    sizes: [
+      { value: "all", label: "By Size" },
+      { value: "330ml", label: "330ml" },
+      { value: "500ml", label: "500ml" },
+      { value: "650ml", label: "650ml" },
+    ],
+    uploadedBy: [
+      { value: "all", label: "Uploaded By" },
+      { value: "Rajesh Kumar", label: "Rajesh Kumar" },
+      { value: "Amit Sharma", label: "Amit Sharma" },
+      { value: "Priya Singh", label: "Priya Singh" },
+      { value: "Vikram Malhotra", label: "Vikram Malhotra" },
+    ],
+  },
+  tableData: [
+    {
+      id: "dem-01",
+      storeName: "Apex Liquors (Connaught Place)",
+      productTitle: "Simba Wit",
+      size: "330ml",
+      demandQty: 45,
+      demandDate: "2026-10-24",
+      uploadedBy: { name: "Rajesh Kumar" },
+    },
+    {
+      id: "dem-02",
+      storeName: "Grand Cellars Saket",
+      productTitle: "Simba Strong",
+      size: "650ml",
+      demandQty: 60,
+      demandDate: "2026-10-24",
+      uploadedBy: { name: "Amit Sharma" },
+    },
+    {
+      id: "dem-03",
+      storeName: "Hauz Khas Wine Store",
+      productTitle: "Simba Light",
+      size: "330ml",
+      demandQty: 35,
+      demandDate: "2026-10-23",
+      uploadedBy: { name: "Priya Singh" },
+    },
+    {
+      id: "dem-04",
+      storeName: "Nehru Place Spirits",
+      productTitle: "Simba Stout",
+      size: "330ml",
+      demandQty: 28,
+      demandDate: "2026-10-23",
+      uploadedBy: { name: "Vikram Malhotra" },
+    },
+    {
+      id: "dem-05",
+      storeName: "Khan Market Fine Wines",
+      productTitle: "Simba Roar",
+      size: "500ml",
+      demandQty: 40,
+      demandDate: "2026-10-22",
+      uploadedBy: { name: "Rajesh Kumar" },
+    },
+    {
+      id: "dem-06",
+      storeName: "Rajouri Garden Retail",
+      productTitle: "Simba Wit",
+      size: "330ml",
+      demandQty: 52,
+      demandDate: "2026-10-22",
+      uploadedBy: { name: "Amit Sharma" },
+    },
+    {
+      id: "dem-07",
+      storeName: "Defence Colony Cellars",
+      productTitle: "Simba Strong",
+      size: "650ml",
+      demandQty: 70,
+      demandDate: "2026-10-21",
+      uploadedBy: { name: "Priya Singh" },
+    },
+    {
+      id: "dem-08",
+      storeName: "Vasant Vihar Spirits",
+      productTitle: "Simba Light",
+      size: "330ml",
+      demandQty: 30,
+      demandDate: "2026-10-21",
+      uploadedBy: { name: "Vikram Malhotra" },
+    },
+  ],
+  pagination: {
+    totalPages: 1,
+    totalRows: 8,
+  },
+};
+
+// --- USER MANAGEMENT MODULES DUMMY DATA ---
+
+export const DUMMY_SALES_STAFF_LIST = [
+  { id: "staff-01", name: "Rajesh Kumar" },
+  { id: "staff-02", name: "Priya Singh" },
+  { id: "staff-03", name: "Amit Sharma" },
+  { id: "staff-04", name: "Vikram Malhotra" },
+  { id: "staff-05", name: "Deepak Verma" },
+];
+
+export const DUMMY_STAFF_OVERALL_DATA = {
+  success: true,
+  data: {
+    cards: {
+      totalShops: 8,
+      totalSalesUnits: 8740,
+      breakageOverall: 14,
+      lastUpdated: "2026-10-26T10:30:00Z",
+      startDate: { formatted: "01/10/2026" },
+      endDate: { formatted: "26/10/2026" },
+    },
+    salesByShop: [
+      {
+        id: "shop-01",
+        shopName: "Apex Liquors (Connaught Place)",
+        dpCode: "DCCWS",
+        location: "Connaught Place, Delhi",
+        totalSales: 1420,
+        reportCount: 14,
+        marketShare: 38.5,
+        lastMonth: { units: 1420 },
+        secondLastMonth: { units: 1250 },
+        skus: [
+          {
+            skuName: "Simba Wit 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 540,
+            reportCount: 14,
+            lastReportDate: "26/10/2026",
+          },
+          {
+            skuName: "Simba Light 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 410,
+            reportCount: 14,
+            lastReportDate: "26/10/2026",
+          },
+          {
+            skuName: "Simba Strong 650ml Bottle",
+            sizeML: 650,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 320,
+            reportCount: 12,
+            lastReportDate: "25/10/2026",
+          },
+          {
+            skuName: "Simba Stout 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 150,
+            reportCount: 10,
+            lastReportDate: "24/10/2026",
+          },
+        ],
+      },
+      {
+        id: "shop-02",
+        shopName: "Grand Cellars Saket",
+        dpCode: "DSCSC",
+        location: "Saket, Delhi",
+        totalSales: 1280,
+        reportCount: 12,
+        marketShare: 34.2,
+        lastMonth: { units: 1280 },
+        secondLastMonth: { units: 1100 },
+        skus: [
+          {
+            skuName: "Simba Wit 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 480,
+            reportCount: 12,
+            lastReportDate: "26/10/2026",
+          },
+          {
+            skuName: "Simba Strong 650ml Bottle",
+            sizeML: 650,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 450,
+            reportCount: 12,
+            lastReportDate: "26/10/2026",
+          },
+          {
+            skuName: "Simba Light 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 350,
+            reportCount: 11,
+            lastReportDate: "25/10/2026",
+          },
+          {
+            skuName: "Absolut Vodka 750ml",
+            sizeML: 750,
+            brandName: "Absolut",
+            category: "VODKA",
+            totalSales: 190,
+            reportCount: 8,
+            lastReportDate: "23/10/2026",
+          },
+        ],
+      },
+      {
+        id: "shop-03",
+        shopName: "Hauz Khas Wine Store",
+        dpCode: "DSIIDC",
+        location: "Hauz Khas, Delhi",
+        totalSales: 1150,
+        reportCount: 10,
+        marketShare: 32.0,
+        lastMonth: { units: 1150 },
+        secondLastMonth: { units: 1020 },
+        skus: [
+          {
+            skuName: "Simba Wit 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 460,
+            reportCount: 10,
+            lastReportDate: "25/10/2026",
+          },
+          {
+            skuName: "Simba Stout 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 390,
+            reportCount: 10,
+            lastReportDate: "25/10/2026",
+          },
+          {
+            skuName: "Simba Roar Extra 500ml",
+            sizeML: 500,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 300,
+            reportCount: 9,
+            lastReportDate: "24/10/2026",
+          },
+          {
+            skuName: "Jameson Irish Whiskey 750ml",
+            sizeML: 750,
+            brandName: "Jameson",
+            category: "WHISKY",
+            totalSales: 140,
+            reportCount: 6,
+            lastReportDate: "23/10/2026",
+          },
+        ],
+      },
+      {
+        id: "shop-04",
+        shopName: "Nehru Place Spirits",
+        dpCode: "DTTDC",
+        location: "Nehru Place, Delhi",
+        totalSales: 970,
+        reportCount: 8,
+        marketShare: 29.5,
+        lastMonth: { units: 970 },
+        secondLastMonth: { units: 990 },
+        skus: [
+          {
+            skuName: "Simba Wit 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 380,
+            reportCount: 8,
+            lastReportDate: "25/10/2026",
+          },
+          {
+            skuName: "Simba Light 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 320,
+            reportCount: 8,
+            lastReportDate: "25/10/2026",
+          },
+          {
+            skuName: "Simba Strong 650ml Bottle",
+            sizeML: 650,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 270,
+            reportCount: 7,
+            lastReportDate: "24/10/2026",
+          },
+          {
+            skuName: "Grey Goose Vodka 750ml",
+            sizeML: 750,
+            brandName: "Grey Goose",
+            category: "VODKA",
+            totalSales: 110,
+            reportCount: 5,
+            lastReportDate: "22/10/2026",
+          },
+        ],
+      },
+      {
+        id: "shop-05",
+        shopName: "DLF Cyber Hub Wines",
+        dpCode: "DCCWS",
+        location: "Cyber City, Delhi NCR",
+        totalSales: 1650,
+        reportCount: 16,
+        marketShare: 42.1,
+        lastMonth: { units: 1650 },
+        secondLastMonth: { units: 1400 },
+        skus: [
+          {
+            skuName: "Simba Wit 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 680,
+            reportCount: 16,
+            lastReportDate: "26/10/2026",
+          },
+          {
+            skuName: "Simba Stout 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 510,
+            reportCount: 15,
+            lastReportDate: "26/10/2026",
+          },
+          {
+            skuName: "Monkey Shoulder Scotch 700ml",
+            sizeML: 700,
+            brandName: "Monkey Shoulder",
+            category: "WHISKY",
+            totalSales: 260,
+            reportCount: 10,
+            lastReportDate: "25/10/2026",
+          },
+          {
+            skuName: "Simba Light 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 200,
+            reportCount: 12,
+            lastReportDate: "25/10/2026",
+          },
+        ],
+      },
+      {
+        id: "shop-06",
+        shopName: "South Extension Liquor Mart",
+        dpCode: "DSCSC",
+        location: "South Extension, Delhi",
+        totalSales: 1120,
+        reportCount: 11,
+        marketShare: 31.8,
+        lastMonth: { units: 1120 },
+        secondLastMonth: { units: 1050 },
+        skus: [
+          {
+            skuName: "Simba Wit 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 440,
+            reportCount: 11,
+            lastReportDate: "26/10/2026",
+          },
+          {
+            skuName: "Simba Strong 650ml Bottle",
+            sizeML: 650,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 380,
+            reportCount: 10,
+            lastReportDate: "25/10/2026",
+          },
+          {
+            skuName: "Smirnoff Red Vodka 750ml",
+            sizeML: 750,
+            brandName: "Smirnoff",
+            category: "VODKA",
+            totalSales: 180,
+            reportCount: 8,
+            lastReportDate: "24/10/2026",
+          },
+          {
+            skuName: "Johnnie Walker Black Label 750ml",
+            sizeML: 750,
+            brandName: "Johnnie Walker",
+            category: "WHISKY",
+            totalSales: 120,
+            reportCount: 6,
+            lastReportDate: "23/10/2026",
+          },
+        ],
+      },
+      {
+        id: "shop-07",
+        shopName: "Vasant Vihar Beverage Hub",
+        dpCode: "DSIIDC",
+        location: "Vasant Vihar, Delhi",
+        totalSales: 890,
+        reportCount: 9,
+        marketShare: 27.4,
+        lastMonth: { units: 890 },
+        secondLastMonth: { units: 820 },
+        skus: [
+          {
+            skuName: "Simba Wit 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 350,
+            reportCount: 9,
+            lastReportDate: "25/10/2026",
+          },
+          {
+            skuName: "Simba Light 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 290,
+            reportCount: 8,
+            lastReportDate: "24/10/2026",
+          },
+          {
+            skuName: "Simba Stout 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 150,
+            reportCount: 6,
+            lastReportDate: "24/10/2026",
+          },
+          {
+            skuName: "Chivas Regal 12 Year 750ml",
+            sizeML: 750,
+            brandName: "Chivas Regal",
+            category: "WHISKY",
+            totalSales: 100,
+            reportCount: 5,
+            lastReportDate: "22/10/2026",
+          },
+        ],
+      },
+      {
+        id: "shop-08",
+        shopName: "Rajouri Garden Spirits",
+        dpCode: "DTTDC",
+        location: "Rajouri Garden, Delhi",
+        totalSales: 1260,
+        reportCount: 13,
+        marketShare: 35.6,
+        lastMonth: { units: 1260 },
+        secondLastMonth: { units: 1150 },
+        skus: [
+          {
+            skuName: "Simba Strong 650ml Bottle",
+            sizeML: 650,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 520,
+            reportCount: 13,
+            lastReportDate: "26/10/2026",
+          },
+          {
+            skuName: "Simba Wit 330ml Can",
+            sizeML: 330,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 410,
+            reportCount: 12,
+            lastReportDate: "25/10/2026",
+          },
+          {
+            skuName: "Simba Roar Extra 500ml",
+            sizeML: 500,
+            brandName: "Simba",
+            category: "BEER",
+            totalSales: 210,
+            reportCount: 9,
+            lastReportDate: "24/10/2026",
+          },
+          {
+            skuName: "Absolut Citron Vodka 750ml",
+            sizeML: 750,
+            brandName: "Absolut",
+            category: "VODKA",
+            totalSales: 120,
+            reportCount: 6,
+            lastReportDate: "23/10/2026",
+          },
+        ],
+      },
+    ],
+  },
+};
+
+export const DUMMY_STAFF_DATA_BY_ID = {
+  period: {
+    startDate: "01/10/2026",
+    endDate: "26/10/2026",
+  },
+};
+
+export const DUMMY_MARKET_SHARE_COMPREHENSIVE_RESPONSE = {
+  success: true,
+  data: {
+    overview: {
+      buckets: [
+        { name: "0-10% Share", value: 4, count: 4, percentage: 12, color: "#64748B" },
+        { name: "10-25% Share", value: 12, count: 12, percentage: 28, color: "#FFA133" },
+        { name: "25-40% Share", value: 18, count: 18, percentage: 42, color: "#FF4250" },
+        { name: "40%+ Share", value: 8, count: 8, percentage: 18, color: "#2EBD85" },
+      ],
+    },
+    comprehensive: {
+      summary: {
+        totalShops: 42,
+        totalBEERShops: 38,
+        totalIMFLShops: 30,
+        totalCombinedShops: 26,
+        totalMarketUnits: 54080,
+        totalBEERUnits: 32400,
+        totalIMFLUnits: 21680,
+        targetBrandShare: 34.2,
+        benchmark: {
+          overallBenchmarkVariancePercent: 5.4,
+        },
+      },
+      pagination: {
+        currentPage: 1,
+        totalPages: 1,
+        totalShops: 4,
+        limit: 10,
+      },
+      shopSummary: [
+        {
+          shopId: "shop-01",
+          shopName: "Apex Liquors (Connaught Place)",
+          vendorCode: "VEND-101",
+          reportType: "BEER & IMFL",
+          totalShopUnits: 4200,
+          totalMarketUnits: 10500,
+          brandLevel: [
+            { brandName: "Simba", totalUnits: 1680, marketShare: 40.0 },
+            { brandName: "Kingfisher", totalUnits: 1450, marketShare: 34.5 },
+            { brandName: "Bira 91", totalUnits: 620, marketShare: 14.8 },
+            { brandName: "Carlsberg", totalUnits: 450, marketShare: 10.7 },
+          ],
+          skuLevel: [
+            {
+              skuId: "sku-01",
+              productName: "Simba Wit",
+              sizeMl: "330ml",
+              brandName: "Simba",
+              totalUnits: 720,
+              marketShare: 42.8,
+              mappingStatus: "Mapped",
+              benchmark: {
+                industryMonthlyUnits: 650,
+                industryDailyBenchmark: 25,
+                currentMonthUnits: 720,
+                currentDailyAverage: 28,
+                benchmarkVariance: 70,
+                benchmarkVariancePercent: 10.8,
+                status: "ahead",
+              },
+            },
+            {
+              skuId: "sku-04",
+              productName: "Simba Strong",
+              sizeMl: "650ml",
+              brandName: "Simba",
+              totalUnits: 560,
+              marketShare: 33.3,
+              mappingStatus: "Mapped",
+              benchmark: {
+                industryMonthlyUnits: 520,
+                industryDailyBenchmark: 20,
+                currentMonthUnits: 560,
+                currentDailyAverage: 22,
+                benchmarkVariance: 40,
+                benchmarkVariancePercent: 7.7,
+                status: "ahead",
+              },
+            },
+            {
+              skuId: "sku-02",
+              productName: "Simba Light",
+              sizeMl: "330ml",
+              brandName: "Simba",
+              totalUnits: 400,
+              marketShare: 23.9,
+              mappingStatus: "Mapped",
+              benchmark: {
+                industryMonthlyUnits: 420,
+                industryDailyBenchmark: 16,
+                currentMonthUnits: 400,
+                currentDailyAverage: 15,
+                benchmarkVariance: -20,
+                benchmarkVariancePercent: -4.8,
+                status: "behind",
+              },
+            },
+          ],
+        },
+        {
+          shopId: "shop-02",
+          shopName: "Grand Cellars Saket",
+          vendorCode: "VEND-102",
+          reportType: "BEER & IMFL",
+          totalShopUnits: 3800,
+          totalMarketUnits: 10550,
+          brandLevel: [
+            { brandName: "Simba", totalUnits: 1368, marketShare: 36.0 },
+            { brandName: "Kingfisher", totalUnits: 1400, marketShare: 36.8 },
+            { brandName: "Bira 91", totalUnits: 680, marketShare: 17.9 },
+            { brandName: "Budweiser", totalUnits: 352, marketShare: 9.3 },
+          ],
+          skuLevel: [
+            {
+              skuId: "sku-01",
+              productName: "Simba Wit",
+              sizeMl: "330ml",
+              brandName: "Simba",
+              totalUnits: 620,
+              marketShare: 45.3,
+              mappingStatus: "Mapped",
+              benchmark: {
+                industryMonthlyUnits: 580,
+                industryDailyBenchmark: 22,
+                currentMonthUnits: 620,
+                currentDailyAverage: 24,
+                benchmarkVariance: 40,
+                benchmarkVariancePercent: 6.9,
+                status: "ahead",
+              },
+            },
+            {
+              skuId: "sku-04",
+              productName: "Simba Strong",
+              sizeMl: "650ml",
+              brandName: "Simba",
+              totalUnits: 480,
+              marketShare: 35.1,
+              mappingStatus: "Mapped",
+              benchmark: {
+                industryMonthlyUnits: 450,
+                industryDailyBenchmark: 17,
+                currentMonthUnits: 480,
+                currentDailyAverage: 18.5,
+                benchmarkVariance: 30,
+                benchmarkVariancePercent: 6.7,
+                status: "ahead",
+              },
+            },
+          ],
+        },
+        {
+          shopId: "shop-03",
+          shopName: "Hauz Khas Wine Store",
+          vendorCode: "VEND-103",
+          reportType: "BEER",
+          totalShopUnits: 3400,
+          totalMarketUnits: 10000,
+          brandLevel: [
+            { brandName: "Simba", totalUnits: 1156, marketShare: 34.0 },
+            { brandName: "Kingfisher", totalUnits: 1300, marketShare: 38.2 },
+            { brandName: "Bira 91", totalUnits: 580, marketShare: 17.1 },
+            { brandName: "Others", totalUnits: 364, marketShare: 10.7 },
+          ],
+          skuLevel: [
+            {
+              skuId: "sku-01",
+              productName: "Simba Wit",
+              sizeMl: "330ml",
+              brandName: "Simba",
+              totalUnits: 540,
+              marketShare: 46.7,
+              mappingStatus: "Mapped",
+              benchmark: {
+                industryMonthlyUnits: 500,
+                industryDailyBenchmark: 19,
+                currentMonthUnits: 540,
+                currentDailyAverage: 21,
+                benchmarkVariance: 40,
+                benchmarkVariancePercent: 8.0,
+                status: "ahead",
+              },
+            },
+          ],
+        },
+        {
+          shopId: "shop-04",
+          shopName: "Nehru Place Spirits",
+          vendorCode: "VEND-104",
+          reportType: "BEER & IMFL",
+          totalShopUnits: 2900,
+          totalMarketUnits: 9800,
+          brandLevel: [
+            { brandName: "Simba", totalUnits: 928, marketShare: 32.0 },
+            { brandName: "Kingfisher", totalUnits: 1100, marketShare: 37.9 },
+            { brandName: "Carlsberg", totalUnits: 520, marketShare: 17.9 },
+            { brandName: "Others", totalUnits: 352, marketShare: 12.1 },
+          ],
+          skuLevel: [
+            {
+              skuId: "sku-01",
+              productName: "Simba Wit",
+              sizeMl: "330ml",
+              brandName: "Simba",
+              totalUnits: 460,
+              marketShare: 49.6,
+              mappingStatus: "Mapped",
+              benchmark: {
+                industryMonthlyUnits: 430,
+                industryDailyBenchmark: 16,
+                currentMonthUnits: 460,
+                currentDailyAverage: 18,
+                benchmarkVariance: 30,
+                benchmarkVariancePercent: 7.0,
+                status: "ahead",
+              },
+            },
+          ],
+        },
+      ],
+    },
+  },
+};
+
+export const DUMMY_USER_MAPPING = {
+  findSalesPerson: [
+    { id: 1, full_name: "Rajesh Kumar" },
+    { id: 2, full_name: "Priya Singh" },
+    { id: 3, full_name: "Amit Sharma" },
+    { id: 4, full_name: "Vikram Malhotra" },
+    { id: 5, full_name: "Deepak Verma" },
+  ],
+  users: [
+    { id: "staff-01", first_name: "Rajesh", last_name: "Kumar", email: "rajesh@simbabeer.com" },
+    { id: "staff-02", first_name: "Priya", last_name: "Singh", email: "priya@simbabeer.com" },
+    { id: "staff-03", first_name: "Amit", last_name: "Sharma", email: "amit@simbabeer.com" },
+    { id: "staff-04", first_name: "Vikram", last_name: "Malhotra", email: "vikram@simbabeer.com" },
+    { id: "staff-05", first_name: "Deepak", last_name: "Verma", email: "deepak@simbabeer.com" },
+  ],
+  assignedShops: [
+    { id: "shop-01", shop_name: "Apex Liquors (Connaught Place)", original_dp_code: "DCCWS", state: "Delhi", district: "Central Delhi", shop_assigned: true },
+    { id: "shop-02", shop_name: "Grand Cellars Saket", original_dp_code: "DSCSC", state: "Delhi", district: "South Delhi", shop_assigned: true },
+    { id: "shop-03", shop_name: "Hauz Khas Wine Store", original_dp_code: "DSIIDC", state: "Delhi", district: "Hauz Khas", shop_assigned: false },
+    { id: "shop-04", shop_name: "Nehru Place Spirits", original_dp_code: "DTTDC", state: "Delhi", district: "East Delhi", shop_assigned: true },
+    { id: "shop-05", shop_name: "Khan Market Fine Wines", original_dp_code: "DCCWS", state: "Delhi", district: "Central Delhi", shop_assigned: false },
+    { id: "shop-06", shop_name: "Rajouri Garden Retail", original_dp_code: "DSIIDC", state: "Delhi", district: "West Delhi", shop_assigned: true },
+  ],
+};
+
+export const DUMMY_INVENTORY_RESPONSE = {
+  success: true,
+  data: [
+    {
+      shop_id: "shop-01",
+      shops: {
+        id: "shop-01",
+        shop_name: "Apex Liquors (Connaught Place)",
+        original_dp_code: "DCCWS",
+        state: "Delhi",
+        district: "Central Delhi",
+      },
+      skus: [
+        { sku_id: "sku-01", brand_name: "Simba", product_name: "Simba Wit 330ml Can", size_ml: 330, category: "BEER", stock: "142" },
+        { sku_id: "sku-02", brand_name: "Simba", product_name: "Simba Light 330ml Can", size_ml: 330, category: "BEER", stock: "118" },
+        { sku_id: "sku-04", brand_name: "Simba", product_name: "Simba Strong 650ml Bottle", size_ml: 650, category: "BEER", stock: "96" },
+        { sku_id: "sku-03", brand_name: "Simba", product_name: "Simba Stout 330ml Can", size_ml: 330, category: "BEER", stock: "84" },
+      ],
+    },
+    {
+      shop_id: "shop-02",
+      shops: {
+        id: "shop-02",
+        shop_name: "Grand Cellars Saket",
+        original_dp_code: "DSCSC",
+        state: "Delhi",
+        district: "South Delhi",
+      },
+      skus: [
+        { sku_id: "sku-01", brand_name: "Simba", product_name: "Simba Wit 330ml Can", size_ml: 330, category: "BEER", stock: "125" },
+        { sku_id: "sku-04", brand_name: "Simba", product_name: "Simba Strong 650ml Bottle", size_ml: 650, category: "BEER", stock: "110" },
+        { sku_id: "sku-02", brand_name: "Simba", product_name: "Simba Light 330ml Can", size_ml: 330, category: "BEER", stock: "95" },
+        { sku_id: "sku-03", brand_name: "Simba", product_name: "Simba Stout 330ml Can", size_ml: 330, category: "BEER", stock: "60" },
+      ],
+    },
+    {
+      shop_id: "shop-03",
+      shops: {
+        id: "shop-03",
+        shop_name: "Hauz Khas Wine Store",
+        original_dp_code: "DSIIDC",
+        state: "Delhi",
+        district: "Hauz Khas",
+      },
+      skus: [
+        { sku_id: "sku-01", brand_name: "Simba", product_name: "Simba Wit 330ml Can", size_ml: 330, category: "BEER", stock: "110" },
+        { sku_id: "sku-04", brand_name: "Simba", product_name: "Simba Strong 650ml Bottle", size_ml: 650, category: "BEER", stock: "88" },
+        { sku_id: "sku-02", brand_name: "Simba", product_name: "Simba Light 330ml Can", size_ml: 330, category: "BEER", stock: "82" },
+        { sku_id: "sku-03", brand_name: "Simba", product_name: "Simba Stout 330ml Can", size_ml: 330, category: "BEER", stock: "48" },
+      ],
+    },
+    {
+      shop_id: "shop-04",
+      shops: {
+        id: "shop-04",
+        shop_name: "Nehru Place Spirits",
+        original_dp_code: "DTTDC",
+        state: "Delhi",
+        district: "East Delhi",
+      },
+      skus: [
+        { sku_id: "sku-01", brand_name: "Simba", product_name: "Simba Wit 330ml Can", size_ml: 330, category: "BEER", stock: "95" },
+        { sku_id: "sku-04", brand_name: "Simba", product_name: "Simba Strong 650ml Bottle", size_ml: 650, category: "BEER", stock: "75" },
+        { sku_id: "sku-02", brand_name: "Simba", product_name: "Simba Light 330ml Can", size_ml: 330, category: "BEER", stock: "70" },
+      ],
+    },
+    {
+      shop_id: "shop-05",
+      shops: {
+        id: "shop-05",
+        shop_name: "Khan Market Fine Wines",
+        original_dp_code: "DCCWS",
+        state: "Delhi",
+        district: "Central Delhi",
+      },
+      skus: [
+        { sku_id: "sku-01", brand_name: "Simba", product_name: "Simba Wit 330ml Can", size_ml: 330, category: "BEER", stock: "130" },
+        { sku_id: "sku-02", brand_name: "Simba", product_name: "Simba Light 330ml Can", size_ml: 330, category: "BEER", stock: "105" },
+        { sku_id: "sku-04", brand_name: "Simba", product_name: "Simba Strong 650ml Bottle", size_ml: 650, category: "BEER", stock: "90" },
+      ],
+    },
+  ],
+  pagination: {
+    currentPage: 1,
+    totalPages: 1,
+    totalShops: 5,
+  },
+};
+

@@ -1,5 +1,6 @@
 import { useState as useLocalState, useCallback as useLocalCallback, useEffect } from 'react';
 import { ShopSalesVsClosingData } from "@/lib/types/dashboard.types";
+import { DUMMY_SHOP_SALES_VS_CLOSING } from "@/lib/constants/dummyData";
 
 export const useShopSalesVsClosingData = ({ searchTerm, selectedLocation, dateRange, category }: { searchTerm?: string; selectedLocation?: string; dateRange?: { start: string; end: string }; category?: string }) => {
   const [data, setData] = useLocalState<ShopSalesVsClosingData[] | null>(null);
@@ -31,13 +32,14 @@ export const useShopSalesVsClosingData = ({ searchTerm, selectedLocation, dateRa
         throw new Error(`API request failed: ${response.status} ${response.statusText}`);
       }
       const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to fetch shop sales vs closing data');
+      if (!result.success || !result.data) {
+        setData(DUMMY_SHOP_SALES_VS_CLOSING as unknown as ShopSalesVsClosingData[]);
+      } else {
+        setData(result.data);
       }
-      setData(result.data);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error'));
-      setIsError(true);
+      console.warn("Using dummy data fallback for shop sales vs closing:", err);
+      setData(DUMMY_SHOP_SALES_VS_CLOSING as unknown as ShopSalesVsClosingData[]);
     } finally {
       setIsLoading(false);
     }

@@ -6,6 +6,7 @@
 import { UserRole } from "../rbac";
 import { deleteCookie, setCookie } from "cookies-next";
 import type { SerializeOptions } from "cookie";
+import { DUMMY_USER, DUMMY_STAFF_USER, DUMMY_AUTH_TOKEN } from "../constants/dummyData";
 
 /**
  * Simple JWT decoder for client-side use (no verification, just decoding)
@@ -80,82 +81,46 @@ export class AuthClientService {
   }
 
   /**
-   * Get current session from localStorage
+   * Get current session from localStorage with dummy fallback
    */
   static async getSession(): Promise<JWTSession | null> {
     if (typeof window === "undefined") return null;
 
     try {
-      const token = localStorage.getItem(AuthClientService.TOKEN_KEY);
-      const userJson = localStorage.getItem(AuthClientService.USER_KEY);
+      let token = localStorage.getItem(AuthClientService.TOKEN_KEY);
+      let userJson = localStorage.getItem(AuthClientService.USER_KEY);
 
       if (!token || !userJson) {
-        // console.log("🔒 No token or user data found in localStorage");
-        // Don't redirect from public routes - let ProtectedRoute handle it
-        // This allows public routes to render properly
-        return null;
-      }
-
-      // Check if cookies exist - if localStorage has token but cookies don't,
-      // it means browser was closed and cookies expired (session cookies)
-      const cookieToken = AuthClientService.getCookieValue(AuthClientService.TOKEN_KEY);
-      if (!cookieToken) {
-        // Cookies missing but localStorage has token - clear everything
-        // console.log("🔒 Cookie missing but localStorage has token - clearing session");
-        AuthClientService.clearSession();
-        // Don't redirect from public routes - let ProtectedRoute handle it
-        return null;
-      }
-
-      // Decode token without verifying (client-side can't securely verify anyway)
-      // Just check if it's expired
-      try {
-        const decoded = decodeJWT(token);
-
-        if (!decoded || !decoded.exp) {
-          // Invalid token format
-          // console.log("🔒 Invalid token format - clearing session");
-          AuthClientService.clearSession();
-          if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
-            window.location.href = '/';
-          }
+        // Don't auto-login on public routes so user can see login form if desired
+        if (AuthClientService.isPublicRoute(window.location.pathname)) {
           return null;
         }
-
-        // Check if token is expired
-        const currentTime = Math.floor(Date.now() / 1000);
-        if (decoded.exp < currentTime) {
-          // Token expired
-          // console.log("🔒 Token expired - clearing session");
-          AuthClientService.clearSession();
-          if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
-            window.location.href = '/';
-          }
-          return null;
-        }
-
-        const user: JWTUser = JSON.parse(userJson);
-
+        // Auto-restore dummy session on protected pages
+        token = DUMMY_AUTH_TOKEN;
+        const dummyUser = window.location.pathname.startsWith('/staff') ? DUMMY_STAFF_USER : DUMMY_USER;
+        AuthClientService.setSession(token, dummyUser as any);
         return {
           access_token: token,
           token_type: "Bearer",
-          user,
+          user: dummyUser as any,
         };
-      } catch (decodeError) {
-        // Token invalid, clear storage
-        // console.log("🔒 Token decode failed:", decodeError);
-        AuthClientService.clearSession();
-        if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
-          window.location.href = '/';
-        }
-        return null;
       }
-    } catch (error) {
-      console.error("🔒 Error getting session:", error);
-      AuthClientService.clearSession();
-      if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
-        window.location.href = '/';
+
+      // Synchronize cookie if missing
+      const cookieToken = AuthClientService.getCookieValue(AuthClientService.TOKEN_KEY);
+      if (!cookieToken) {
+        const cookieOptions = AuthClientService.buildCookieOptions(token);
+        setCookie(AuthClientService.TOKEN_KEY, token, cookieOptions);
+        setCookie(AuthClientService.USER_KEY, userJson, cookieOptions);
       }
+
+      const user: JWTUser = JSON.parse(userJson);
+      return {
+        access_token: token,
+        token_type: "Bearer",
+        user,
+      };
+    } catch {
       return null;
     }
   }
@@ -278,7 +243,7 @@ export class AuthClientService {
   }
 
   /**
-   * Sign in via API route (calls EC2 backend)
+   * Sign in via dummy session
    */
   static async signIn(
     credentials: { email: string; password: string } | string,
@@ -287,77 +252,21 @@ export class AuthClientService {
     try {
       const email =
         typeof credentials === "string" ? credentials : credentials.email;
-      const pwd =
-        typeof credentials === "string" ? password! : credentials.password;
-
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://3.91.17.245:4000';
-
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password: pwd }),
-      });
-
-      if (!response.ok) {
-        let errorMessage = "Sign in failed";
-        try {
-          const errorText = await response.text();
-          if (errorText) {
-            const error = JSON.parse(errorText);
-            errorMessage = error.error || errorMessage;
-          }
-        } catch (parseError) {
-          // If response is not JSON, use status text or default message
-          errorMessage =
-            response.statusText || `HTTP ${response.status}: Sign in failed`;
-        }
-        throw new Error(errorMessage);
-      }
-
-      const responseText = await response.text();
-      if (!responseText) {
-        throw new Error("Empty response from server");
-      }
-
-      // console.log('🔍 Login API Response:', responseText);
-      const data = JSON.parse(responseText);
-      // console.log('🔍 Parsed data:', data);
-
-      // Get token from cookie or response
-      // EC2 backend returns: {success, token, user}
-      const token =
-        data.token ||
-        data?.data?.token ||
-        response.headers
-          .get("set-cookie")
-          ?.split("auth-token=")[1]
-          ?.split(";")[0];
-
-      // console.log('🔍 Extracted token:', token ? 'Present' : 'Missing');
-
-      if (!token) {
-        throw new Error("No authentication token received");
-      }
-
-      // Transform API response to JWTUser format
-      // EC2 backend returns: {success, token, user: {id, email, firstName, lastName, role, phone}}
-      const userData = data.user || data?.data?.user;
-      // console.log('🔍 User data:', userData);
-
-      if (!userData) {
-        console.error('❌ Full response data:', JSON.stringify(data, null, 2));
-        throw new Error("No user data received from server");
-      }
+      const isStaff =
+        (email && email.toLowerCase().includes("staff")) ||
+        (typeof window !== "undefined" && window.location.pathname.startsWith("/staff"));
+      const selectedUser = isStaff ? DUMMY_STAFF_USER : DUMMY_USER;
+      const token = DUMMY_AUTH_TOKEN;
 
       const jwtUser: JWTUser = {
-        id: userData.id,
-        email: userData.email,
+        id: selectedUser.id,
+        email: email || selectedUser.email,
         user_metadata: {
-          role: userData.role,
-          first_name: userData.firstName,
-          last_name: userData.lastName,
-          phone: userData.phone || "",
-          is_active: userData.is_active !== undefined ? userData.is_active : true,
+          role: selectedUser.user_metadata.role as any,
+          first_name: selectedUser.user_metadata.first_name,
+          last_name: selectedUser.user_metadata.last_name,
+          phone: selectedUser.user_metadata.phone || "",
+          is_active: true,
         },
       };
 
@@ -406,25 +315,24 @@ export class AuthClientService {
   }
 
   /**
-   * Get user profile from API (calls EC2 backend)
+   * Get user profile with dummy fallback
    */
   static async getUserProfile(userId: string): Promise<UserProfile | null> {
     const session = await AuthClientService.getSession();
-    if (!session) return null;
+    const user = session?.user || DUMMY_USER;
+    const role = (user.user_metadata?.role || DUMMY_USER.role) as UserRole;
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://3.91.17.245:4000';
-
-    const response = await fetch(`${API_BASE_URL}/api/auth/users/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch user profile");
-    }
-
-    return response.json();
+    return {
+      id: user.id || DUMMY_USER.id,
+      email: user.email || DUMMY_USER.email,
+      role: role,
+      firstName: user.user_metadata?.first_name || DUMMY_USER.first_name,
+      lastName: user.user_metadata?.last_name || DUMMY_USER.last_name,
+      phone: user.user_metadata?.phone || DUMMY_USER.phone,
+      emailVerified: true,
+      lastSignIn: new Date().toISOString(),
+      createdAt: DUMMY_USER.created_at,
+    };
   }
 
   /**

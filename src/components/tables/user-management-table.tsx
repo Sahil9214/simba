@@ -26,16 +26,12 @@ import {
   Edit,
   Trash2,
 } from "lucide-react";
-import {
-  useUsers,
-  useCanManageUsers,
-  useUpdateData,
-} from "@/hooks/api/useUserManagement";
+import { DUMMY_USERS_LIST } from "@/lib/constants/dummyData";
 import type { UserFilters } from "@/lib/types/userManagement.types";
 import { Switch } from "../ui/switch";
 import { Modal } from "../ui/modal";
 import { useDebounced } from "@/hooks/useDebounce";
-import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface UserManagementTableProps {
   onView?: (user: any) => void;
@@ -49,13 +45,14 @@ interface UserManagementTableProps {
 
 export const UserManagementTable: React.FC<UserManagementTableProps> = ({
   onView,
-  onEdit,
-  onDelete,
-  toggleUserStatus,
+  onEdit: externalOnEdit,
+  onDelete: externalOnDelete,
+  toggleUserStatus: externalToggleUserStatus,
   itemsPerPage = 10,
   showPagination = true,
   filters: externalFilters,
 }) => {
+  const [usersList, setUsersList] = useState<any[]>(DUMMY_USERS_LIST);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
@@ -70,27 +67,29 @@ export const UserManagementTable: React.FC<UserManagementTableProps> = ({
     setCurrentPage(1);
   }, [debouncedSearchTerm, roleFilter, statusFilter, externalFilters]);
 
-  // Build filters for API call
-  const queryFilters = useMemo(() => {
-    const filters: UserFilters = {
-      ...externalFilters,
-      ...(debouncedSearchTerm && { search: debouncedSearchTerm.trim() }),
-      ...(roleFilter !== "all" && { role: roleFilter }),
-      ...(statusFilter !== "all" && {
-        is_active:
-          statusFilter === "active"
-            ? true
-            : statusFilter === "inactive"
-            ? false
-            : "",
-      }),
-    };
-    return filters;
-  }, [externalFilters, debouncedSearchTerm, roleFilter, statusFilter]);
+  // Filter dummy users locally
+  const filteredUsers = useMemo(() => {
+    return usersList.filter((u) => {
+      if (debouncedSearchTerm) {
+        const query = debouncedSearchTerm.toLowerCase();
+        const fullName = `${u.first_name || ""} ${u.last_name || ""}`.toLowerCase();
+        const email = (u.email || "").toLowerCase();
+        if (!fullName.includes(query) && !email.includes(query)) return false;
+      }
+      if (roleFilter !== "all" && u.role !== roleFilter) {
+        return false;
+      }
+      if (statusFilter === "active" && !u.is_active) {
+        return false;
+      }
+      if (statusFilter === "inactive" && u.is_active) {
+        return false;
+      }
+      return true;
+    });
+  }, [usersList, debouncedSearchTerm, roleFilter, statusFilter]);
 
-  const { data: usersData, isLoading, error } = useUsers(queryFilters);
-  const users = usersData || [];
-
+  const users = filteredUsers;
   const totalPages = Math.ceil(users.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -115,21 +114,29 @@ export const UserManagementTable: React.FC<UserManagementTableProps> = ({
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  const permissions = useCanManageUsers();
-  const { user: currentUser } = useAuth();
-  const currentUserRole = currentUser?.user_metadata?.role;
+  const handleToggleStatus = (user: any) => {
+    setUsersList((prev) =>
+      prev.map((u) => (u.id === user.id ? { ...u, is_active: !u.is_active } : u))
+    );
+    toast.success(`User status changed to ${!user.is_active ? "Active" : "Inactive"}`);
+    externalToggleUserStatus?.(user);
+  };
 
-  // Helper function to check if manager can modify super_admin or other managers
-  const canModifyUser = (targetUser: any): boolean => {
-    // If current user is super_admin, they can modify anyone
-    if (currentUserRole === "super_admin") {
-      return true;
-    }
-    // If current user is manager, they cannot modify super_admin or other managers
-    if (currentUserRole === "manager" && (targetUser?.role === "super_admin" || targetUser?.role === "manager")) {
-      return false;
-    }
-    // Otherwise, allow modification
+  const handleEditUser = (updatedData: any) => {
+    setUsersList((prev) =>
+      prev.map((u) => (u.id === selectedUser?.id ? { ...u, ...updatedData } : u))
+    );
+    toast.success("User updated successfully");
+    externalOnEdit?.(updatedData);
+  };
+
+  const handleDeleteUser = (user: any) => {
+    setUsersList((prev) => prev.filter((u) => u.id !== user.id));
+    toast.success("User deleted successfully");
+    externalOnDelete?.(user);
+  };
+
+  const canModifyUser = (_targetUser: any): boolean => {
     return true;
   };
 
@@ -198,29 +205,16 @@ export const UserManagementTable: React.FC<UserManagementTableProps> = ({
                   Status
                 </span>
               </div>
-              {permissions.canViewAllUsers && (
-                <div className="w-[85px] flex items-center p-3 justify-center">
-                  <span className="text-sm font-medium text-placeholder-gray">
-                    Actions
-                  </span>
-                </div>
-              )}
+              <div className="w-[85px] flex items-center p-3 justify-center">
+                <span className="text-sm font-medium text-placeholder-gray">
+                  Actions
+                </span>
+              </div>
             </div>
           </div>
 
           <div className="max-h-[400px] overflow-y-auto">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                  <span className="ml-2 text-gray-600">Loading users...</span>
-                </div>
-              </div>
-            ) : error ? (
-              <div className="flex items-center justify-center h-64 text-red-600">
-                <span>Error loading users: {error.message}</span>
-              </div>
-            ) : currentData.length === 0 ? (
+            {currentData.length === 0 ? (
               <div className="flex items-center justify-center h-32 text-gray-500">
                 <div className="text-center">
                   <p className="text-lg font-medium">No users found</p>
@@ -261,83 +255,47 @@ export const UserManagementTable: React.FC<UserManagementTableProps> = ({
                     <Switch
                       className="cursor-pointer"
                       checked={user.is_active}
-                      onCheckedChange={() => toggleUserStatus?.(user)}
-                      disabled={!canModifyUser(user)}
-                      title={
-                        !canModifyUser(user)
-                          ? "Managers cannot modify Super Admin or Manager users"
-                          : ""
-                      }
+                      onCheckedChange={() => handleToggleStatus(user)}
                     />
                   </div>
-                  {permissions.canViewAllUsers && (
-                    <div className="w-[85px] flex items-center justify-center pr-3">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="w-8 h-8 p-0 hover:bg-gray-50"
-                          >
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="max-w-[180px] sm:min-w-[160px] w-auto mr-2"
+                  <div className="w-[85px] flex items-center justify-center pr-3">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-8 h-8 p-0 hover:bg-gray-50"
                         >
-                          {/* <DropdownMenuItem className="cursor-pointer" onClick={() => onView?.(user)}>
-                                                        <Eye className="w-4 h-4 mr-2 text-gray-500" />View Details
-                                                    </DropdownMenuItem> */}
-                          <DropdownMenuItem
-                            className={
-                              canModifyUser(user)
-                                ? "cursor-pointer"
-                                : "cursor-not-allowed opacity-50"
-                            }
-                            onClick={() => {
-                              if (canModifyUser(user)) {
-                                setSelectedUser(user);
-                                setOpenUserEditModal(true);
-                                onEdit?.(user);
-                              }
-                            }}
-                            disabled={!canModifyUser(user)}
-                            title={
-                              !canModifyUser(user)
-                                ? "Managers cannot edit Super Admin or Manager users"
-                                : ""
-                            }
-                          >
-                            <Edit className="w-4 h-4 mr-2 text-gray-500 cursor-pointer" />
-                            Edit User
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              if (canModifyUser(user)) {
-                                setUserToDelete(user);
-                                setOpenDeleteModal(true);
-                              }
-                            }}
-                            className={
-                              canModifyUser(user)
-                                ? "text-red-600 focus:text-red-600 cursor-pointer"
-                                : "text-red-600 focus:text-red-600 cursor-not-allowed opacity-50"
-                            }
-                            disabled={!canModifyUser(user)}
-                            title={
-                              !canModifyUser(user)
-                                ? "Managers cannot delete Super Admin or Manager users"
-                                : ""
-                            }
-                          >
-                            <Trash2 className="w-4 h-4 mr-2 text-red-600" />
-                            Delete Permanently
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  )}
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="max-w-[180px] sm:min-w-[160px] w-auto mr-2"
+                      >
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setOpenUserEditModal(true);
+                          }}
+                        >
+                          <Edit className="w-4 h-4 mr-2 text-gray-500 cursor-pointer" />
+                          Edit User
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setUserToDelete(user);
+                            setOpenDeleteModal(true);
+                          }}
+                          className="text-red-600 focus:text-red-600 cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2 text-red-600" />
+                          Delete Permanently
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               ))
             )}
@@ -400,7 +358,7 @@ export const UserManagementTable: React.FC<UserManagementTableProps> = ({
               setSelectedUser(null);
             }}
             user={selectedUser}
-            onUpdate={onEdit}
+            onUpdate={handleEditUser}
           />
         )}
         {openDeleteModal && userToDelete && (
@@ -412,7 +370,7 @@ export const UserManagementTable: React.FC<UserManagementTableProps> = ({
             }}
             user={userToDelete}
             onConfirm={() => {
-              onDelete?.(userToDelete);
+              handleDeleteUser(userToDelete);
               setOpenDeleteModal(false);
               setUserToDelete(null);
             }}
@@ -446,7 +404,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
     last_name: "",
     phone: "",
   });
-  const { mutate: updateUser, isPending } = useUpdateData();
+  const [isPending, setIsPending] = React.useState(false);
 
   // Initialize form data when modal opens or user changes
   React.useEffect(() => {
@@ -543,21 +501,13 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
       return;
     }
 
-    // Update user data
-    updateUser(
-      {
-        userId: user.id,
-        first_name: formData.first_name.trim(),
-        last_name: formData.last_name.trim(),
-        phone: formData.phone.trim(),
-      },
-      {
-        onSuccess: () => {
-          onUpdate?.(user);
-          onClose();
-        },
-      }
-    );
+    // Update user data locally
+    onUpdate?.({
+      first_name: formData.first_name.trim(),
+      last_name: formData.last_name.trim(),
+      phone: formData.phone.trim(),
+    });
+    onClose();
   };
 
   return (

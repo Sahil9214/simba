@@ -23,10 +23,8 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { showToast } from "@/components/ui/toast"
-import { useCreateSku, useDeleteSku, useSkus, useUpdateSku } from "@/hooks/useSkus"
+import { DUMMY_SKUS } from "@/lib/constants/dummyData"
 import { useDebounced } from "@/hooks/useDebounce"
-import { getAuthUserIdFromCookie } from "@/lib/utils/authUser"
-import { triggerInventorySync } from "@/lib/services/inventory.service"
 import { useEffect } from "react"
 interface SkuFormState {
     brand_name: string
@@ -62,6 +60,18 @@ const initialFormState: SkuFormState = {
 }
 
 const AddSkus = () => {
+    const [skus, setSkus] = useState<SkuRow[]>(() =>
+        DUMMY_SKUS.map((s) => ({
+            id: s.id,
+            brand_name: s.brand_name,
+            product_name: s.product_name || s.name,
+            brand_code: s.brandCode || s.id,
+            category: s.category,
+            size_ml: s.size_ml,
+            mrp: s.mrp,
+            is_active: s.is_active,
+        }))
+    )
     const [search, setSearch] = useState("")
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -71,22 +81,16 @@ const AddSkus = () => {
     const [deleteSkuState, setDeleteSkuState] = useState<{ id: string; name: string } | null>(null)
     const focusSearch = useRef<HTMLInputElement>(null)
     const debouncedSearch = useDebounced(search, 300)
-
-    const { data: skuListResponse, isLoading } = useSkus()
-    const createSkuMutation = useCreateSku()
-    const updateSkuMutation = useUpdateSku()
-    const deleteSkuMutation = useDeleteSku()
+    const isLoading = false
 
     useEffect(() => {
         focusSearch.current?.focus()
     }, [])
 
-
     const filteredSkus = useMemo(() => {
-        const list = skuListResponse?.data ?? []
         const keyword = debouncedSearch.trim().toLowerCase()
-        if (!keyword) return list
-        return list.filter((sku) => {
+        if (!keyword) return skus
+        return skus.filter((sku) => {
             const brand = sku.brand_name?.toLowerCase() ?? ""
             const product = sku.product_name?.toLowerCase() ?? ""
             const code = sku.brand_code?.toLowerCase() ?? ""
@@ -100,7 +104,7 @@ const AddSkus = () => {
                 size.includes(keyword)
             )
         })
-    }, [debouncedSearch, skuListResponse])
+    }, [debouncedSearch, skus])
 
     const handleFormChange = (field: keyof SkuFormState, value: string | boolean) => {
         setForm((prev) => ({ ...prev, [field]: value }))
@@ -249,25 +253,13 @@ const AddSkus = () => {
                                                         <Switch className="cursor-pointer"
                                                             id={`sku-status-${sku.id}`}
                                                             checked={sku.is_active}
-                                                            onCheckedChange={async (checked) => {
-                                                                try {
-                                                                    await updateSkuMutation.mutateAsync({
-                                                                        id: sku.id,
-                                                                        payload: {
-                                                                            brand_name: sku.brand_name,
-                                                                            product_name: sku.product_name,
-                                                                            brand_code: sku.brand_code,
-                                                                            category: sku.category,
-                                                                            size_ml: Number(sku.size_ml),
-                                                                            mrp: Number(sku.mrp),
-                                                                            is_active: checked,
-                                                                        },
-                                                                    })
-                                                                    showToast("success", `SKU marked as ${checked ? "active" : "inactive"}`)
-                                                                } catch (error: any) {
-                                                                    const message = error?.response?.data?.message || "Failed to update SKU status"
-                                                                    showToast("error", message)
-                                                                }
+                                                            onCheckedChange={(checked) => {
+                                                                setSkus((prev) =>
+                                                                    prev.map((s) =>
+                                                                        s.id === sku.id ? { ...s, is_active: checked } : s
+                                                                    )
+                                                                )
+                                                                showToast("success", `SKU marked as ${checked ? "active" : "inactive"}`)
                                                             }}
                                                         />
                                                         <span className="text-xs font-medium">{sku.is_active ? "Active" : "Inactive"}</span>
@@ -312,24 +304,24 @@ const AddSkus = () => {
             <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New SKU">
                 <form
                     className="space-y-4"
-                    onSubmit={async (e) => {
+                    onSubmit={(e) => {
                         e.preventDefault()
                         const payload = validateAndBuildPayload(form)
                         if (!payload) return
-                        try {
-                            await createSkuMutation.mutateAsync(payload)
-                            const authUserId = getAuthUserIdFromCookie()
-                            if (authUserId) {
-                                // Fire-and-forget inventory sync; errors are handled silently in service
-                                triggerInventorySync(authUserId)
-                            }
-                            showToast("success", "SKU created successfully")
-                            setIsAddModalOpen(false)
-                            resetForm()
-                        } catch (error: any) {
-                            const message = error?.response?.data?.message || "Failed to create SKU"
-                            showToast("error", message)
+                        const newSku: SkuRow = {
+                            id: `sku-${Date.now()}`,
+                            brand_name: payload.brand_name,
+                            product_name: payload.product_name,
+                            brand_code: payload.brand_code,
+                            category: payload.category,
+                            size_ml: payload.size_ml,
+                            mrp: payload.mrp,
+                            is_active: payload.is_active,
                         }
+                        setSkus((prev) => [newSku, ...prev])
+                        showToast("success", "SKU created successfully")
+                        setIsAddModalOpen(false)
+                        resetForm()
                     }}
                 >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -384,7 +376,7 @@ const AddSkus = () => {
                                 id="size_ml"
                                 value={form.size_ml}
                                 onChange={(e) => handleFormChange("size_ml", e.target.value)}
-                                placeholder="650"
+                                placeholder="330"
                                 inputMode="numeric"
                                 required
                                 type="number"
@@ -396,7 +388,7 @@ const AddSkus = () => {
                                 id="mrp"
                                 value={form.mrp}
                                 onChange={(e) => handleFormChange("mrp", e.target.value)}
-                                placeholder="150.00"
+                                placeholder="120"
                                 inputMode="decimal"
                                 required
                                 type="number"
@@ -404,14 +396,12 @@ const AddSkus = () => {
                         </div>
                     </div>
 
-
-
                     <div className="flex justify-end gap-3 pt-4 border-t border-dashed border-gray-200">
                         <Button type="button" variant="outline" onClick={() => setIsAddModalOpen(false)}>
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={createSkuMutation.isPending} className="bg-linear-to-b from-[#FF4250] to-[#D73742] hover:opacity-90 shadow-sm">
-                            {createSkuMutation.isPending ? "Creating..." : "Create SKU"}
+                        <Button type="submit" className="bg-linear-to-b from-[#FF4250] to-[#D73742] hover:opacity-90 shadow-sm">
+                            Create SKU
                         </Button>
                     </div>
                 </form>
@@ -429,20 +419,17 @@ const AddSkus = () => {
                 {editSku && (
                     <form
                         className="space-y-4"
-                        onSubmit={async (e) => {
+                        onSubmit={(e) => {
                             e.preventDefault()
                             const payload = validateAndBuildPayload(form)
                             if (!payload) return
-                            try {
-                                await updateSkuMutation.mutateAsync({ id: editSku.id, payload })
-                                showToast("success", "SKU updated successfully")
-                                setIsEditModalOpen(false)
-                                setEditSku(null)
-                                resetForm()
-                            } catch (error: any) {
-                                const message = error?.response?.data?.message || "Failed to update SKU"
-                                showToast("error", message)
-                            }
+                            setSkus((prev) =>
+                                prev.map((s) => (s.id === editSku.id ? { ...s, ...payload } : s))
+                            )
+                            showToast("success", "SKU updated successfully")
+                            setIsEditModalOpen(false)
+                            setEditSku(null)
+                            resetForm()
                         }}
                     >
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -512,8 +499,6 @@ const AddSkus = () => {
                             </div>
                         </div>
 
-
-
                         <div className="flex justify-end gap-3 pt-4 border-t border-dashed border-gray-200">
                             <Button
                                 type="button"
@@ -526,8 +511,8 @@ const AddSkus = () => {
                             >
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={updateSkuMutation.isPending} className="bg-linear-to-b from-[#FF4250] to-[#D73742] hover:opacity-90 shadow-sm">
-                                {updateSkuMutation.isPending ? "Saving..." : "Save Changes"}
+                            <Button type="submit" className="bg-linear-to-b from-[#FF4250] to-[#D73742] hover:opacity-90 shadow-sm">
+                                Save Changes
                             </Button>
                         </div>
                     </form>
@@ -561,22 +546,17 @@ const AddSkus = () => {
                         </Button>
                         <Button
                             type="button"
-                            disabled={deleteSkuMutation.isPending || !deleteSkuState?.id}
-                            onClick={async () => {
+                            disabled={!deleteSkuState?.id}
+                            onClick={() => {
                                 if (!deleteSkuState?.id) return
-                                try {
-                                    await deleteSkuMutation.mutateAsync(deleteSkuState.id)
-                                    showToast("success", "SKU deleted successfully")
-                                    setIsDeleteModalOpen(false)
-                                    setDeleteSkuState(null)
-                                } catch (error: any) {
-                                    const message = error?.response?.data?.message || "Failed to delete SKU"
-                                    showToast("error", message)
-                                }
+                                setSkus((prev) => prev.filter((s) => s.id !== deleteSkuState.id))
+                                showToast("success", "SKU deleted successfully")
+                                setIsDeleteModalOpen(false)
+                                setDeleteSkuState(null)
                             }}
                             className="bg-red-600 hover:bg-red-700 text-white shadow-sm"
                         >
-                            {deleteSkuMutation.isPending ? "Deleting..." : "Delete"}
+                            Delete
                         </Button>
                     </div>
                 </div>

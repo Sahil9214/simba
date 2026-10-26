@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { DUMMY_SHOP_BRAND_STOCK_RESPONSE } from '@/lib/constants/dummyData';
 
 export interface StockLevel {
   closingStock: number;
@@ -69,24 +70,26 @@ export const useShopBrandStock = (filters: ShopBrandStockFilters) => {
 
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://3.91.17.245:4000';
       const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-      // const response = await fetch(`${API_BASE_URL}/api/stocks/shop-brand-stock?${params.toString()}`, {
-      //   headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-      // });
-      const response = await fetch(`${API_BASE_URL}/api/stocks/shop-brand-stock?${params.toString()}`, {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-      })
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/stocks/shop-brand-stock?${params.toString()}`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch shop-brand stock data');
+        if (!response.ok) {
+          return DUMMY_SHOP_BRAND_STOCK_RESPONSE as ShopBrandStockResponse;
+        }
+
+        const result: ShopBrandStockResponse = await response.json();
+
+        if (!result.success || !result.data) {
+          return DUMMY_SHOP_BRAND_STOCK_RESPONSE as ShopBrandStockResponse;
+        }
+      
+        return result;
+      } catch (err) {
+        console.warn("Using dummy data fallback for shop-brand-stock:", err);
+        return DUMMY_SHOP_BRAND_STOCK_RESPONSE as ShopBrandStockResponse;
       }
-
-      const result: ShopBrandStockResponse = await response.json();
-
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to fetch shop-brand stock data');
-      }
-    
-      return result;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)

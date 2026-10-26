@@ -12,9 +12,7 @@ import {
 import { CloudUpload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { showToast } from "@/components/ui/toast";
-import { useShopSalesMaping, useGetShopsDetail } from "@/hooks/api/useShopSalesMaping";
-import InsufficientPermission from "@/components/auth/InsufficentPermissions";
-import { useCanManageUsers } from "@/hooks/api/useUserManagement";
+import { DUMMY_USER_MAPPING } from "@/lib/constants/dummyData";
 
 // Dynamic imports for optimization
 const ShopUsersTable = dynamic(
@@ -35,28 +33,30 @@ const UserMappingPage = () => {
     search: "",
   });
 
-
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileClick = () => {
     fileInputRef.current?.click();
   };
-  //commit
-  const {
-    mutate,
-    data: uploadResponse,
-    isSuccess: isUploadSuccess,
-    isError: isUploadError,
-    error: uploadError,
-    isPending: isUploadPending,
-  } = useShopSalesMaping();
 
+  const salesPerson = DUMMY_USER_MAPPING.findSalesPerson;
 
-  const { data: shopDetail, isLoading: shopDataLoading, isError: shopDataError } = useGetShopsDetail({
-    headerData: { salesPerson: headerData.salesPerson, search: headerData.search || headerData.salesPerson.toString() }
-  });
-  const users = shopDetail?.data?.users ?? [];
-  const salesPerson = shopDetail?.data?.findSalesPerson ?? [];
+  const users = React.useMemo(() => {
+    let result = [...DUMMY_USER_MAPPING.users];
+    if (headerData.salesPerson) {
+      result = result.filter(u => `${u.first_name} ${u.last_name}`.toLowerCase().includes(headerData.salesPerson.toLowerCase()));
+    }
+    if (headerData.search.trim()) {
+      const q = headerData.search.toLowerCase().trim();
+      result = result.filter(u =>
+        u.first_name.toLowerCase().includes(q) ||
+        u.last_name.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [headerData.salesPerson, headerData.search]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -73,12 +73,13 @@ const UserMappingPage = () => {
       return;
     }
 
-    mutate(file);
+    setIsUploading(true);
+    setTimeout(() => {
+      setIsUploading(false);
+      showToast("success", "Mapping file processed successfully!");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }, 600);
   };
-  const permissions = useCanManageUsers()
-  if (!permissions.canViewAllUsers) {
-    return <InsufficientPermission />
-  }
   return (
     <>
       <header className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 p-4 bg-white rounded-xl border-b border-gray-200">
@@ -99,12 +100,12 @@ const UserMappingPage = () => {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
           <button
             onClick={handleFileClick}
-            disabled={isUploadPending}
+            disabled={isUploading}
             className="flex flex-row justify-center items-center px-4 py-2 gap-2 h-10 bg-gradient-to-b from-[#FF4250] to-[#D73742] rounded-lg shadow-sm hover:opacity-90 transition-opacity active:scale-95 duration-300 text-white text-sm font-medium w-full sm:w-auto"
             style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }}
           >
             <CloudUpload className="w-4 h-4 text-[#FAFAFA]" />
-            {isUploadPending ? "Uploading..." : "Upload CSV"}
+            {isUploading ? "Uploading..." : "Upload CSV"}
           </button>
 
           {/* Hidden File Input */}

@@ -4,9 +4,7 @@ import dynamic from 'next/dynamic';
 import { ChevronDown, CircleUserRound, Menu, X, Calendar, Search, ArrowLeftCircle, FilterX, MapPin, Package } from "lucide-react";
 import { showToast } from '@/components/ui/toast';
 import { ExportReportsButton } from '@/components/ui/export-reports-button';
-import InsufficientPermission from "@/components/auth/InsufficentPermissions";
-import { useCanManageUsers } from "@/hooks/api/useUserManagement";
-import { useFetchStaffDataById, useFetchStaffMemberOverall, useGetStaffPerson } from '@/hooks/api/useSalesEmployeePanel';
+import { DUMMY_SALES_STAFF_LIST, DUMMY_STAFF_OVERALL_DATA, DUMMY_STAFF_DATA_BY_ID } from '@/lib/constants/dummyData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
@@ -92,11 +90,12 @@ const SalesManagerPage = () => {
     };
   }, [selectedMonthFilter]);
 
-  const { data } = useGetStaffPerson(dateRange.startDate, dateRange.endDate);
-
-  const { data: staffData, refetch: refetchStaffData } = useFetchStaffDataById(staffId, false, dateRange.startDate, dateRange.endDate, category);
-
-  const { data: staffOverview, isError, isLoading } = useFetchStaffMemberOverall(staffId, dateRange.startDate, dateRange.endDate, category);
+  // Dummy data instead of API calls
+  const data = useMemo(() => ({ data: DUMMY_SALES_STAFF_LIST }), []);
+  const staffData = useMemo(() => DUMMY_STAFF_DATA_BY_ID, []);
+  const staffOverview = useMemo(() => DUMMY_STAFF_OVERALL_DATA, []);
+  const isLoading = false;
+  const isError = false;
 
 
 
@@ -127,6 +126,15 @@ const SalesManagerPage = () => {
       );
     }
 
+    // Filter by Category
+    if (category && category.toLowerCase() !== 'all') {
+      const catLower = category.toLowerCase();
+      filteredSalesByShop = filteredSalesByShop.filter((sale: any) => {
+        if (!sale.skus || !Array.isArray(sale.skus)) return true;
+        return sale.skus.some((sku: any) => sku.category?.toLowerCase() === catLower);
+      });
+    }
+
     return {
       ...staffOverview,
       data: {
@@ -134,7 +142,7 @@ const SalesManagerPage = () => {
         salesByShop: filteredSalesByShop
       }
     };
-  }, [staffOverview, searchTerm, selectedDpCode]);
+  }, [staffOverview, searchTerm, selectedDpCode, category]);
 
   // Set first staff member as default
   useEffect(() => {
@@ -182,8 +190,6 @@ const SalesManagerPage = () => {
     return staffOverview?.data?.salesByShop?.length || 0;
   }, [staffOverview]);
 
-  const permissions = useCanManageUsers();
-
   const handleEmployeeSelect = (employeeId: string) => {
     const selectedStaff = data?.data?.find((staff: { name: string, id: string }) => staff.id === employeeId);
     if (selectedStaff) {
@@ -193,25 +199,9 @@ const SalesManagerPage = () => {
     setIsDropdownOpen(false);
   };
 
-
   const handleExportReport = async () => {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://3.91.17.245:4000';
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-    const url = `${API_BASE_URL}/api/staff-pl/${staffId}/overview`;
     try {
-      const response = await fetch(url,
-        {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        }
-      )
-      const result = await response.json();
-
-      if (!result.success || !result.data) {
-        showToast('error', 'Failed to fetch data for export');
-        return;
-      }
+      const salesByShop = filteredStaffOverview?.data?.salesByShop || staffOverview?.data?.salesByShop || [];
 
       // Convert data to CSV
       const csvRows: string[] = [];
@@ -233,8 +223,8 @@ const SalesManagerPage = () => {
       csvRows.push(headers.join(','));
 
       // Process salesByShop data
-      if (result.data.salesByShop && Array.isArray(result.data.salesByShop)) {
-        result.data.salesByShop.forEach((shop: any) => {
+      if (salesByShop && Array.isArray(salesByShop)) {
+        salesByShop.forEach((shop: any) => {
           const shopName = escapeCSV(shop.shopName || '');
           const dpCode = escapeCSV(shop.dpCode || '');
           const location = escapeCSV(shop.location || '');
@@ -290,7 +280,7 @@ const SalesManagerPage = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(blobUrl);
 
       showToast('success', 'Report exported successfully');
     } catch (error) {
@@ -310,14 +300,8 @@ const SalesManagerPage = () => {
     return stringValue;
   }
 
-
   const handleStaffMonthData = () => {
-    refetchStaffData();
-  }
-
-  // Early return after all hooks
-  if (!permissions.canViewAllUsers) {
-    return <InsufficientPermission />
+    // dummy handler
   }
 
   return (

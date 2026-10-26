@@ -8,6 +8,8 @@ import { AuthErrorBoundary } from "@/components/auth/AuthErrorBoundary";
 import { Toaster } from "sonner";
 // Import Recharts patch for React 19 compatibility
 import "@/utils/recharts-patch";
+// Import Mock Interceptor for offline dummy mode
+import "@/utils/mockInterceptor";
 import { RechartsErrorHandler } from "@/components/RechartsErrorHandler";
 
 const geist = localFont({

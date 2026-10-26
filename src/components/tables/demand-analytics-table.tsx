@@ -27,6 +27,7 @@ import {
 import { ExportReportsButton } from "@/components/ui/export-reports-button";
 import Image from "next/image";
 import axios from "axios";
+import { DUMMY_DEMAND_TABLE_DATA } from "@/lib/constants/dummyData";
 
 // Data types for Demand Analytics
 export interface DemandAnalyticsRow {
@@ -69,24 +70,18 @@ export const DemandAnalyticsTable: React.FC<DemandAnalyticsProps> = ({
   category,
 }) => {
 
-  const [data, setData] = useState<DemandAnalyticsRow[]>([]);
+  const [data, setData] = useState<DemandAnalyticsRow[]>(DUMMY_DEMAND_TABLE_DATA.tableData as DemandAnalyticsRow[]);
   const [loading, setLoading] = useState(false);
 
   // Filter options from API (ALL data, not just paginated)
-  const [productOptions, setProductOptions] = useState<FilterOption[]>([
-    { value: "all", label: "All Products" }
-  ]);
-  const [sizeOptions, setSizeOptions] = useState<FilterOption[]>([
-    { value: "all", label: "By Size" }
-  ]);
-  const [uploadedByOptions, setUploadedByOptions] = useState<FilterOption[]>([
-    { value: "all", label: "Uploaded By" }
-  ]);
+  const [productOptions, setProductOptions] = useState<FilterOption[]>(DUMMY_DEMAND_TABLE_DATA.filters.products);
+  const [sizeOptions, setSizeOptions] = useState<FilterOption[]>(DUMMY_DEMAND_TABLE_DATA.filters.sizes);
+  const [uploadedByOptions, setUploadedByOptions] = useState<FilterOption[]>(DUMMY_DEMAND_TABLE_DATA.filters.uploadedBy);
 
   // Pagination state (server-side)
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalRows, setTotalRows] = useState(0);
+  const [totalPages, setTotalPages] = useState(DUMMY_DEMAND_TABLE_DATA.pagination.totalPages);
+  const [totalRows, setTotalRows] = useState(DUMMY_DEMAND_TABLE_DATA.pagination.totalRows);
 
   // Filter states
   const [searchValue, setSearchValue] = useState("");
@@ -196,16 +191,19 @@ export const DemandAnalyticsTable: React.FC<DemandAnalyticsProps> = ({
 
       const res = await axios.get(`${API_BASE_URL}/api/demand/table?${params.toString()}`);
 
-      if (res.data.success) {
+      if (res.data && res.data.success) {
         // Map the response data to match component expectations
         setData(res.data.data.tableData);
 
         // Update pagination from your API response structure
         setTotalPages(res.data.data.pagination.totalPages);
         setTotalRows(res.data.data.pagination.totalRows);
+      } else {
+        setData(DUMMY_DEMAND_TABLE_DATA.tableData as DemandAnalyticsRow[]);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.warn('Error fetching data, using dummy fallback:', error);
+      setData(DUMMY_DEMAND_TABLE_DATA.tableData as DemandAnalyticsRow[]);
     } finally {
       setLoading(false);
     }

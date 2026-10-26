@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "../ui/button";
 import { Store, Hash, CheckCircle2, Search, X, ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { useGetAssignedShopsDetailById, useAssignShopToUser, useUnassignShopFromUser } from "@/hooks/api/useShopSalesMaping";
+import { DUMMY_USER_MAPPING } from "@/lib/constants/dummyData";
 import { showToast } from "@/components/ui/toast";
 import {
   Dialog,
@@ -42,32 +42,22 @@ export function ShopUsersTable({
   const [searchShop, setSearchShop] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [localShops, setLocalShops] = useState<any[]>([...DUMMY_USER_MAPPING.assignedShops]);
   const itemsPerPage = 30;
-
-  const getShopsMutation = useGetAssignedShopsDetailById();
 
   const fetchShops = (id: string, searchTerm: string, page: number) => {
     setLoading(true);
-    const offset = (page - 1) * itemsPerPage;
+    const q = searchTerm.toLowerCase().trim();
+    const filtered = localShops.filter((s: any) =>
+      !q || s.shop_name?.toLowerCase().includes(q) || s.original_dp_code?.toLowerCase().includes(q)
+    );
 
-    getShopsMutation.mutate({ id, search: searchTerm, limit: itemsPerPage, offset }, {
-      onSuccess: (data) => {
-
-        setLoading(false);
-        const uniqueShops = data?.data?.shops?.filter((shop: any, index: number, self: any[]) =>
-          index === self.findIndex((s: any) => s.id === shop.id)
-        ) || [];
-
-        setAssignedShopDetail({
-          userId: data?.data?.user_id,
-          shops: uniqueShops,
-          pagination: data?.data?.pagination || null
-        });
-      },
-      onError: (error) => {
-        setLoading(false);
-      }
+    setAssignedShopDetail({
+      userId: id,
+      shops: filtered,
+      pagination: { with_filters: filtered.length }
     });
+    setLoading(false);
   };
 
   const handleViewShops = (id: string) => {
@@ -223,9 +213,7 @@ export function ViewShopsSheet({
   const totalPages = Math.ceil(totalShops / itemsPerPage);
   const startItem = totalShops === 0 ? 0 : ((currentPage || 1) - 1) * itemsPerPage + 1;
   const endItem = Math.min((currentPage || 1) * itemsPerPage, totalShops);
-  const assignShop = useAssignShopToUser();
-  const unassignShop = useUnassignShopFromUser();
-  const isMutating = assignShop.isPending || unassignShop.isPending;
+  const isMutating = false;
 
   const handleToggleShop = (shop: any) => {
     if (!currentUserId || isMutating) return;
@@ -239,22 +227,10 @@ export function ViewShopsSheet({
   };
 
   const performShopToggle = (shop: any) => {
-    const vars = { userId: currentUserId, shopId: shop.id };
-    const doMutate = shop.shop_assigned ? unassignShop.mutate : assignShop.mutate;
-
-    doMutate(vars, {
-      onSuccess: () => {
-        showToast("success", shop.shop_assigned ? "Shop unassigned" : "Shop assigned");
-        // refresh current page with current filters
-        fetchShops(currentUserId, searchShop || "", currentPage || 1);
-        setConfirmationModal({ isOpen: false, shop: null, isAssigning: false });
-      },
-      onError: (err: any) => {
-        const msg = err?.response?.data?.message || "Operation failed";
-        showToast("error", msg);
-        setConfirmationModal({ isOpen: false, shop: null, isAssigning: false });
-      },
-    });
+    shop.shop_assigned = !shop.shop_assigned;
+    showToast("success", shop.shop_assigned ? "Shop assigned" : "Shop unassigned");
+    fetchShops(currentUserId, searchShop || "", currentPage || 1);
+    setConfirmationModal({ isOpen: false, shop: null, isAssigning: false });
   };
 
   const handleConfirmToggle = () => {

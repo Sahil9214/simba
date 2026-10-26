@@ -10,6 +10,12 @@ export type {
 } from './breakageReport.service';
 
 import type { BreakageFilters } from './breakageReport.service';
+import {
+  DUMMY_BREAKAGE_STATISTICS,
+  DUMMY_BREAKAGE_BY_SHOP,
+  DUMMY_BREAKAGE_BY_SKU,
+  DUMMY_BREAKAGE_TRENDS,
+} from '@/lib/constants/dummyData';
 
 // API Base URL - EC2 Backend
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://3.91.17.245:4000';
@@ -83,16 +89,20 @@ class BreakageReportClientService {
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
-    const queryString = buildQueryString(filters);
-    const response = await fetch(`${API_BASE_URL}/api/reports/breakage/statistics${queryString}`);
+    try {
+      const queryString = buildQueryString(filters);
+      const response = await fetch(`${API_BASE_URL}/api/reports/breakage/statistics${queryString}`);
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch breakage statistics');
+      if (!response.ok) {
+        return DUMMY_BREAKAGE_STATISTICS;
+      }
+
+      const data = await response.json();
+      this.setCache(cacheKey, data);
+      return data;
+    } catch {
+      return DUMMY_BREAKAGE_STATISTICS;
     }
-
-    const data = await response.json();
-    this.setCache(cacheKey, data);
-    return data;
   }
 
   /**
@@ -103,16 +113,20 @@ class BreakageReportClientService {
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
-    const queryString = buildQueryString(filters);
-    const response = await fetch(`${API_BASE_URL}/api/reports/breakage/by-shop${queryString}`);
+    try {
+      const queryString = buildQueryString(filters);
+      const response = await fetch(`${API_BASE_URL}/api/reports/breakage/by-shop${queryString}`);
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch breakage by shop data');
+      if (!response.ok) {
+        return DUMMY_BREAKAGE_BY_SHOP;
+      }
+
+      const data = await response.json();
+      this.setCache(cacheKey, data);
+      return data;
+    } catch {
+      return DUMMY_BREAKAGE_BY_SHOP;
     }
-
-    const data = await response.json();
-    this.setCache(cacheKey, data);
-    return data;
   }
 
   /**
@@ -122,17 +136,20 @@ class BreakageReportClientService {
     const cacheKey = this.getCacheKey('by_sku', filters);
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
-    const queryString = buildQueryString(filters);
-    // const response = await fetch(`${API_BASE_URL}/api/reports/breakage/by-sku${queryString}`);
-    const response = await fetch(`${API_BASE_URL}/api/reports/breakage/by-sku${queryString}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch breakage by SKU data');
+
+    try {
+      const queryString = buildQueryString(filters);
+      const response = await fetch(`${API_BASE_URL}/api/reports/breakage/by-sku${queryString}`);
+      if (!response.ok) {
+        return DUMMY_BREAKAGE_BY_SKU;
+      }
+
+      const data = await response.json();
+      this.setCache(cacheKey, data);
+      return data;
+    } catch {
+      return DUMMY_BREAKAGE_BY_SKU;
     }
-
-    const data = await response.json();
-
-    this.setCache(cacheKey, data);
-    return data;
   }
 
   /**
@@ -143,16 +160,20 @@ class BreakageReportClientService {
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
-    const queryString = buildQueryString(filters);
-    const response = await fetch(`${API_BASE_URL}/api/reports/breakage/trends${queryString}`);
+    try {
+      const queryString = buildQueryString(filters);
+      const response = await fetch(`${API_BASE_URL}/api/reports/breakage/trends${queryString}`);
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch breakage trends');
+      if (!response.ok) {
+        return DUMMY_BREAKAGE_TRENDS;
+      }
+
+      const data = await response.json();
+      this.setCache(cacheKey, data);
+      return data;
+    } catch {
+      return DUMMY_BREAKAGE_TRENDS;
     }
-
-    const data = await response.json();
-    this.setCache(cacheKey, data);
-    return data;
   }
 
   /**
@@ -163,16 +184,40 @@ class BreakageReportClientService {
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
-    const queryString = buildQueryString(filters);
-    const response = await fetch(`${API_BASE_URL}/api/reports/breakage/analysis${queryString}`);
+    const dummyAnalysis = {
+      summary: {
+        totalBreakages: 116,
+        totalValue: 24360,
+        affectedShops: 6,
+        affectedSKUs: 5,
+        breakageRate: 0.68,
+      },
+      causes: [
+        { cause: "Handling Transit", count: 54, percentage: 46.5, value: 11340 },
+        { cause: "Storage Damage", count: 38, percentage: 32.8, value: 7980 },
+        { cause: "Display Mishap", count: 24, percentage: 20.7, value: 5040 },
+      ],
+      patterns: [],
+      recommendations: [
+        "Improve cushioning on transit crates for 650ml bottles",
+        "Maintain maximum stack height of 4 layers in retail shops",
+      ],
+    };
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch breakage analysis');
+    try {
+      const queryString = buildQueryString(filters);
+      const response = await fetch(`${API_BASE_URL}/api/reports/breakage/analysis${queryString}`);
+
+      if (!response.ok) {
+        return dummyAnalysis;
+      }
+
+      const data = await response.json();
+      this.setCache(cacheKey, data);
+      return data;
+    } catch {
+      return dummyAnalysis;
     }
-
-    const data = await response.json();
-    this.setCache(cacheKey, data);
-    return data;
   }
 
   /**

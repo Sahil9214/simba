@@ -3,9 +3,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import dynamic from 'next/dynamic';
 import { ChevronDown, CircleUserRound, Download, Menu, X, Calendar, Search, ArrowLeftCircle, FilterX, MapPin, Package, ChevronLeft, ChevronRight } from "lucide-react";
 import { showToast } from '@/components/ui/toast';
-import InsufficientPermission from "@/components/auth/InsufficentPermissions";
-import { useCanManageUsers } from "@/hooks/api/useUserManagement";
-import { useGetStaffPerson, useMarketShareComprehensive } from '@/hooks/api/useSalesEmployeePanel';
+import { DUMMY_SALES_STAFF_LIST, DUMMY_MARKET_SHARE_COMPREHENSIVE_RESPONSE } from '@/lib/constants/dummyData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
@@ -154,27 +152,10 @@ const SalesManagerPage = () => {
     };
   }, [selectedMonthFilter]);
 
-  const { data } = useGetStaffPerson(dateRange.startDate, dateRange.endDate) as {
-    data?: {
-      data?: Array<{ id: string; name: string }>
-    }
-  };
-
-
-  const queryEnabled = !!staffId && !!selectedMonth;
-  const { data: marketShareData, isLoading: isMarketShareLoading, isError: isMarketShareError } = useMarketShareComprehensive({
-    date: selectedMonth,
-    staffId: staffId,
-    dpCode: selectedDpCode,
-    category: category,
-    page: currentPage,
-    limit: 2,
-    enabled: queryEnabled
-  }) as {
-    data?: any;
-    isLoading: boolean;
-    isError: boolean;
-  };
+  const data = useMemo(() => ({ data: [{ id: "All", name: "All" }, ...DUMMY_SALES_STAFF_LIST] }), []);
+  const marketShareData = useMemo(() => DUMMY_MARKET_SHARE_COMPREHENSIVE_RESPONSE, []);
+  const isMarketShareLoading = false;
+  const isMarketShareError = false;
   // console.log("🤷‍♂️🤷‍♂️🤷‍♂️🤷‍♂️", marketShareData)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -206,8 +187,6 @@ const SalesManagerPage = () => {
   const hasActiveFilters = useMemo(() => {
     return searchTerm.trim() !== '' || selectedDpCode !== 'all' || selectedMonthFilter !== 'all' || category !== 'all' || selectedMonth !== getDefaultMonth();
   }, [searchTerm, selectedDpCode, selectedMonthFilter, category, selectedMonth]);
-
-  const permissions = useCanManageUsers();
 
   const handleEmployeeSelect = (employeeId: string) => {
     if (employeeId === "All") {
@@ -345,13 +324,7 @@ const SalesManagerPage = () => {
       console.error('Export error:', error);
       showToast('error', 'Failed to export report');
     }
-  }
-
-
-  // Early return after all hooks
-  if (!permissions.canViewAllUsers) {
-    return <InsufficientPermission />
-  }
+  };
 
   return (
     <div className="w-full space-y-4">

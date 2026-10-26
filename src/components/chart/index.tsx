@@ -8,7 +8,8 @@ import { LineChartSalesVsClosing } from "./line-chart-sales-vs-closing";
 import { BreakageByShopHorizontal } from "./breakage-by-shop-horizontal";
 import { StoreReportVsFieldChart } from "./StoreReportVsFieldChart";
 import { BreakageTrendsChart } from "./breakage-trends-chart";
-import { MarketSharePieChart } from "./market-share-pie-chart";
+import { MarketSharePieChart, MarketShareBucket } from "./market-share-pie-chart";
+export type { MarketShareBucket };
 
 // All chart components now support:
 // - Dynamic data from API hooks

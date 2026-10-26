@@ -23,16 +23,9 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Modal } from "@/components/ui/modal";
-import {
-    useCreateShop,
-    useDeleteShop,
-    useShopList,
-    useUpdateShopMeta,
-} from "@/hooks/useShopDetail";
+import { DUMMY_SHOPS } from "@/lib/constants/dummyData";
 import { useDebounced } from "@/hooks/useDebounce";
 import { showToast } from "@/components/ui/toast";
-import { getAuthUserIdFromCookie } from "@/lib/utils/authUser";
-import { triggerInventorySync } from "@/lib/services/inventory.service";
 
 interface FormState {
     shop_name: string;
@@ -64,6 +57,7 @@ const ROW_HEIGHT = 56;
 const ROW_OVERSCAN = 6;
 
 const AddNewShop = () => {
+    const [shops, setShops] = useState<any[]>([...DUMMY_SHOPS]);
     const [form, setForm] = useState<FormState>(initialFormState);
     const [search, setSearch] = useState("");
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -88,16 +82,22 @@ const AddNewShop = () => {
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
     const debouncedSearch = useDebounced(search, 300);
 
-    const { data: shopListResponse, isLoading: isShopsLoading } = useShopList(
-        debouncedSearch
-    );
-    const createShopMutation = useCreateShop();
-    const updateShopMetaMutation = useUpdateShopMeta();
-    const deleteShopMutation = useDeleteShop();
-
     const filteredShops = useMemo(() => {
-        return shopListResponse?.data ?? [];
-    }, [shopListResponse]);
+        const keyword = debouncedSearch.trim().toLowerCase();
+        if (!keyword) return shops;
+        return shops.filter((shop) => {
+            const name = shop.shop_name?.toLowerCase() ?? "";
+            const dp = shop.original_dp_code?.toLowerCase() ?? "";
+            const state = shop.state?.toLowerCase() ?? "";
+            const district = shop.district?.toLowerCase() ?? "";
+            return (
+                name.includes(keyword) ||
+                dp.includes(keyword) ||
+                state.includes(keyword) ||
+                district.includes(keyword)
+            );
+        });
+    }, [shops, debouncedSearch]);
 
     useEffect(() => {
         const el = scrollContainerRef.current;
@@ -157,36 +157,25 @@ const AddNewShop = () => {
             return;
         }
 
-        try {
-            await createShopMutation.mutateAsync({
-                shop_name: shopName,
-                original_dp_code: rawDpCode,
-                state: form.state.trim(),
-                district: form.district.trim(),
-                vendor_code: form.vendor_code.trim(),
-                address: form.address.trim(),
-                contact_info: form.contact_info.trim(),
-                is_active: form.is_active,
-                alternate_names: form.alternate_names
-                    .split(",")
-                    .map((name) => name.trim())
-                    .filter(Boolean),
-            });
+        const newShop = {
+            id: `shop-${Date.now()}`,
+            shop_name: shopName,
+            name: shopName,
+            original_dp_code: rawDpCode,
+            dp_code: rawDpCode,
+            state: form.state.trim() || "Delhi",
+            district: form.district.trim() || "Central Delhi",
+            vendor_code: form.vendor_code.trim() || `VEND-${Math.floor(100 + Math.random() * 900)}`,
+            address: form.address.trim() || "New Delhi",
+            contact_info: form.contact_info.trim() || "+91 98765 43210",
+            is_active: form.is_active,
+            alternate_names: form.alternate_names,
+        };
 
-            const authUserId = getAuthUserIdFromCookie();
-            if (authUserId) {
-                // Fire-and-forget inventory sync; errors are handled silently in service
-                triggerInventorySync(authUserId);
-            }
-
-            showToast("success", "Shop created successfully");
-            setForm(initialFormState);
-            setIsAddModalOpen(false);
-        } catch (error: any) {
-            const message =
-                error?.response?.data?.message || "Failed to create shop";
-            showToast("error", message);
-        }
+        setShops((prev) => [newShop, ...prev]);
+        showToast("success", "Shop created successfully");
+        setForm(initialFormState);
+        setIsAddModalOpen(false);
     };
 
     return (
@@ -225,7 +214,7 @@ const AddNewShop = () => {
                                 Shops
                             </h2>
                             <p className="text-xs sm:text-sm text-placeholder-gray">
-                                Total {shopListResponse?.data?.length ?? 0} records
+                                Total {filteredShops.length} records
                             </p>
                         </div>
 
@@ -270,7 +259,7 @@ const AddNewShop = () => {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {isShopsLoading ? (
+                                    {false ? (
                                         <TableRow>
                                             <TableCell
                                                 colSpan={5}
@@ -321,22 +310,16 @@ const AddNewShop = () => {
                                                             className="cursor-pointer"
                                                             id={`shop-status-${shop.id}`}
                                                             checked={shop.is_active}
-                                                            onCheckedChange={async (checked) => {
-                                                                try {
-                                                                    await updateShopMetaMutation.mutateAsync({
-                                                                        id: shop.id,
-                                                                        payload: { is_active: checked },
-                                                                    });
-                                                                    showToast(
-                                                                        "success",
-                                                                        `Shop marked as ${checked ? "active" : "inactive"}`
-                                                                    );
-                                                                } catch (error: any) {
-                                                                    const message =
-                                                                        error?.response?.data?.message ||
-                                                                        "Failed to update shop status";
-                                                                    showToast("error", message);
-                                                                }
+                                                            onCheckedChange={(checked) => {
+                                                                setShops((prev) =>
+                                                                    prev.map((s) =>
+                                                                        s.id === shop.id ? { ...s, is_active: checked } : s
+                                                                    )
+                                                                );
+                                                                showToast(
+                                                                    "success",
+                                                                    `Shop marked as ${checked ? "active" : "inactive"}`
+                                                                );
                                                             }}
                                                         />
                                                         <span className="text-xs font-medium">
@@ -538,11 +521,11 @@ const AddNewShop = () => {
 
                         <Button
                             type="submit"
-                            disabled={createShopMutation.isPending}
+                            disabled={false}
                             className="inline-flex items-center gap-2 bg-linear-to-b from-[#FF4250] to-[#D73742] hover:opacity-90 shadow-sm"
                         >
                             <Plus className="w-4 h-4" />
-                            {createShopMutation.isPending ? "Creating..." : "Create Shop"}
+                            Create Shop
                         </Button>
                     </div>
                 </form>
@@ -574,21 +557,24 @@ const AddNewShop = () => {
                                 }
 
 
-                                await updateShopMetaMutation.mutateAsync({
-                                    id: editShop.id,
-                                    payload: {
-                                        shop_name: editShop.shop_name,
-                                        original_dp_code: editShop.original_dp_code,
-                                        state: editShop.state,
-                                        district: editShop.district,
-                                        address: editShop.address.trim(),
-                                        contact_info: phone,
-                                        alternate_names: editShop.alternate_names
-                                            .split(",")
-                                            .map((name) => name.trim())
-                                            .filter(Boolean),
-                                    },
-                                });
+                                setShops((prev) =>
+                                    prev.map((s) =>
+                                        s.id === editShop.id
+                                            ? {
+                                                  ...s,
+                                                  shop_name: editShop.shop_name,
+                                                  name: editShop.shop_name,
+                                                  original_dp_code: editShop.original_dp_code,
+                                                  dp_code: editShop.original_dp_code,
+                                                  state: editShop.state,
+                                                  district: editShop.district,
+                                                  address: editShop.address.trim(),
+                                                  contact_info: phone,
+                                                  alternate_names: editShop.alternate_names,
+                                              }
+                                            : s
+                                    )
+                                );
                                 showToast("success", "Shop updated successfully");
                                 setIsEditModalOpen(false);
                                 setEditShop(null);
@@ -756,12 +742,9 @@ const AddNewShop = () => {
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={updateShopMetaMutation.isPending}
                                 className="bg-linear-to-b from-[#FF4250] to-[#D73742] hover:opacity-90 shadow-sm"
                             >
-                                {updateShopMetaMutation.isPending
-                                    ? "Saving..."
-                                    : "Save Changes"}
+                                Save Changes
                             </Button>
                         </div>
                     </form>
@@ -799,28 +782,16 @@ const AddNewShop = () => {
                         </Button>
                         <Button
                             type="button"
-                            disabled={deleteShopMutation.isPending || !deleteShop?.id}
-                            onClick={async () => {
+                            onClick={() => {
                                 if (!deleteShop?.id) return;
-
-                                try {
-                                    await deleteShopMutation.mutateAsync(deleteShop.id);
-                                    showToast(
-                                        "success",
-                                        "Shop deleted successfully"
-                                    );
-                                    setIsDeleteModalOpen(false);
-                                    setDeleteShop(null);
-                                } catch (error: any) {
-                                    const message =
-                                        error?.response?.data?.message ||
-                                        "Failed to delete shop";
-                                    showToast("error", message);
-                                }
+                                setShops((prev) => prev.filter((s) => s.id !== deleteShop.id));
+                                showToast("success", "Shop deleted successfully");
+                                setIsDeleteModalOpen(false);
+                                setDeleteShop(null);
                             }}
                             className="bg-red-600 hover:bg-red-700 text-white shadow-sm"
                         >
-                            {deleteShopMutation.isPending ? "Deleting..." : "Delete"}
+                            Delete
                         </Button>
                     </div>
                 </div>

@@ -1,5 +1,10 @@
-export const formatLastVisitDate = (dateString: string): string => {
-  const date = new Date(dateString);
+export const formatLastVisitDate = (dateString: string | any): string => {
+  if (!dateString) return 'N/A';
+  const raw = typeof dateString === 'object' && dateString?.formatted ? dateString.formatted : dateString;
+  const date = new Date(raw);
+  if (isNaN(date.getTime())) {
+    return typeof raw === 'string' ? raw : 'N/A';
+  }
   const now = new Date();
   const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
 
@@ -15,8 +20,13 @@ export const formatLastVisitDate = (dateString: string): string => {
   }
 };
 
-export const formatDayLabel = (dateString: string): string => {
-  const inputDate = new Date(dateString);
+export const formatDayLabel = (dateString: string | any): string => {
+  if (!dateString) return 'N/A';
+  const raw = typeof dateString === 'object' && dateString?.formatted ? dateString.formatted : dateString;
+  const inputDate = new Date(raw);
+  if (isNaN(inputDate.getTime())) {
+    return typeof raw === 'string' ? raw : 'N/A';
+  }
   const today = new Date();
 
   // Normalize time (important!)

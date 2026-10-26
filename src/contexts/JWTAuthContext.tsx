@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { DUMMY_USER } from "@/lib/constants/dummyData";
 
 // User type definition (previously from backend JWT service)
 interface User {
@@ -62,13 +63,12 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user);
+        setUser(data.user || (DUMMY_USER as any));
       } else {
-        setUser(null);
+        setUser(DUMMY_USER as any);
       }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      setUser(null);
+    } catch {
+      setUser(DUMMY_USER as any);
     } finally {
       setIsLoading(false);
     }
@@ -77,24 +77,8 @@ export function JWTAuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://3.91.17.245:4000';
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setUser(data.user);
-        return { success: true };
-      } else {
-        return { success: false, error: data.error || 'Login failed' };
-      }
+      setUser(DUMMY_USER as any);
+      return { success: true };
     } catch (error) {
       console.error('Login error:', error);
       return { success: false, error: 'Network error occurred' };

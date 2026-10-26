@@ -1,13 +1,7 @@
 "use client"
 import React, { useState } from "react";
-import { Users, UserCheck, UserX, Shield } from "lucide-react";
-import { useCanManageUsers, useUserStatistics, useCreateUser, useDeleteUser, useToggleUserStatus } from "@/hooks/api/useUserManagement";
-import InsufficientPermission from "@/components/auth/InsufficentPermissions";
-import { useAuth } from "@/contexts/AuthContext";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
-import { getErrorByType } from "next/dist/next-devtools/dev-overlay/utils/get-error-by-type";
-import { getErrorHandler } from "@/utils/errorHandler";
 
 const UserManagementTable = dynamic(
     () => import("@/components/tables/user-management-table").then((mod) => ({ default: mod.UserManagementTable })),
@@ -26,27 +20,12 @@ const HeaderData = dynamic(
 );
 
 export default function UserManagementPage() {
-    const { profile } = useAuth()
-    const permissions = useCanManageUsers()
-
-    const { mutate: deleteUser } = useDeleteUser()
-    const { mutate: toggleUser } = useToggleUserStatus();
-    const { mutate: createUserMutation, isPending: isCreatingUser, isError: hasError, isSuccess: isSuccessful } = useCreateUser()
     const [invitedUserData, setInvitedUserData] = useState<{
         firstName: string
         lastName: string
         email: string
     } | null>(null)
-
-    if (!permissions.canViewAllUsers) {
-        return (
-            <InsufficientPermission
-                requiredRole=" Super Admin"
-                currentRole={profile?.role}
-                feature="User Management"
-            />
-        )
-    }
+    const [isCreatingUser, setIsCreatingUser] = useState(false)
 
     const handleAddSalesperson = async (data: {
         firstName: string
@@ -55,52 +34,20 @@ export default function UserManagementPage() {
         email: string
         phoneNumber: string
     }) => {
-        // Generate a temporary password (user should reset on first login)
-        const tempPassword = `Temp${Math.random().toString(36).slice(2, 10)}!1`
-
-        return new Promise<void>((resolve, reject) => {
-            createUserMutation({
-                email: data.email,
-                password: tempPassword,
-                first_name: data.firstName,
-                last_name: data.lastName,
-                phone: data.phoneNumber,
-                role: data.role as any
-            }, {
-                onSuccess: () => {
-                    // Store user data for success modal
-                    setInvitedUserData({
-                        firstName: data.firstName,
-                        lastName: data.lastName,
-                        email: data.email
-                    })
-                    resolve()
-                },
-                onError: (err) => {
-
-                    reject(err)
-                }
-            })
+        setIsCreatingUser(true)
+        // Simulate creation delay
+        await new Promise((resolve) => setTimeout(resolve, 300))
+        setIsCreatingUser(false)
+        setInvitedUserData({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email
         })
+        toast.success(`User ${data.firstName} ${data.lastName} created successfully!`)
     }
 
     const handleInviteSent = () => {
-        // This is called when success modal should be shown
-        // The success modal will be controlled by invitedUserData state
-    }
-
-    const onDelete = (user: any) => {
-        deleteUser(user.id)
-    };
-
-
-    const toggleUserStatus = (user: any) => {
-        const { id, is_active } = user;
-        toggleUser({ userId: id, is_active: !is_active })
-    }
-
-    const onEdit = (user: any) => {
-        console.log(user)
+        // Controlled by invitedUserData
     }
 
     return (
@@ -121,12 +68,9 @@ export default function UserManagementPage() {
                     isCreatingUser={isCreatingUser}
                 />
                 {/* User Management Table */}
-                <UserManagementTable
-                    onDelete={onDelete}
-                    toggleUserStatus={toggleUserStatus}
-                    onEdit={onEdit}
-                />
+                <UserManagementTable />
             </div>
         </main>
     )
 }
+

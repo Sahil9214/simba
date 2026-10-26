@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
+import "@/utils/mockInterceptor";
 import {
     QueryClient,
     QueryClientProvider,

@@ -2,11 +2,9 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { ChevronDown, ChevronRight, ArrowLeftCircle, Search } from "lucide-react";
-import InsufficientPermission from "@/components/auth/InsufficentPermissions";
-import { useCanManageUsers } from "@/hooks/api/useUserManagement";
+import { DUMMY_INVENTORY_RESPONSE } from '@/lib/constants/dummyData';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
-import { useFetchInventoryDataByShop } from '@/hooks/api/useInventory';
 
 // Dynamic imports for optimization
 const HeaderData = dynamic(
@@ -340,26 +338,35 @@ const InventoryPage = () => {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [searchInput]);
 
-  const { data: inventoryResponse, isPending, isError } = useFetchInventoryDataByShop(product, currentPage, searchTerm);
-
-  // Maintain focus after loading completes
-  useEffect(() => {
-    if (!isPending && wasFocusedRef.current && searchFocus.current) {
-      // Use setTimeout to ensure DOM is ready
-      setTimeout(() => {
-        if (searchFocus.current) {
-          searchFocus.current.focus();
-          // Position cursor at the end
-          const length = searchInput.length;
-          searchFocus.current.setSelectionRange(length, length);
-        }
-      }, 0);
+  const filteredInventory = useMemo(() => {
+    let shops = DUMMY_INVENTORY_RESPONSE.data;
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase().trim();
+      shops = shops.filter(item =>
+        item.shops.shop_name.toLowerCase().includes(q) ||
+        item.shops.original_dp_code.toLowerCase().includes(q) ||
+        item.shops.district.toLowerCase().includes(q) ||
+        item.skus.some(s => s.product_name.toLowerCase().includes(q) || s.brand_name.toLowerCase().includes(q))
+      );
     }
-  }, [isPending, searchInput]);
+    if (product && product.toLowerCase() !== "all" && product.toLowerCase() !== "all products") {
+      const p = product.toLowerCase();
+      shops = shops.map(item => ({
+        ...item,
+        skus: item.skus.filter(s => s.category.toLowerCase() === p || s.product_name.toLowerCase().includes(p))
+      })).filter(item => item.skus.length > 0);
+    }
+    return shops;
+  }, [searchTerm, product]);
 
-  const fetchAllShop = inventoryResponse?.data;
-  const pagination = inventoryResponse?.pagination;
-  const permissions = useCanManageUsers();
+  const fetchAllShop = filteredInventory;
+  const pagination = {
+    currentPage: 1,
+    totalPages: 1,
+    totalShops: filteredInventory.length,
+  };
+  const isPending = false;
+  const isError = false;
 
   // Extract shops with their respective SKUs from the API response
   // fetchAllShop is an array where each item has: { shop_id, shops: {...}, skus: [...] }
@@ -411,11 +418,6 @@ const InventoryPage = () => {
       // Scroll to top of the page for better UX
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }
-
-  // Early return after all hooks
-  if (!permissions.canViewAllUsers) {
-    return <InsufficientPermission />
   }
 
   return (
@@ -503,7 +505,7 @@ const InventoryPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="flex flex-col items-center p-4 gap-2 bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="font-inter font-bold text-2xl leading-[120%] text-primary">
-                {inventoryResponse.total}
+                {summaryStats.totalShops}
               </div>
               <div className="font-inter font-medium text-xs leading-[120%] text-sidebar-foreground text-center">
                 Total Shops
