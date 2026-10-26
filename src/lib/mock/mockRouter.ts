@@ -37,8 +37,10 @@ import {
   DUMMY_CRITICAL_ISSUES,
   DUMMY_CRITICAL_METRICS,
   DUMMY_AI_DASHBOARD,
+  DUMMY_UPLOAD_ANALYTICS,
   DUMMY_UPLOAD_SESSIONS,
   DUMMY_OCR_REVIEW_DATA,
+  getDummyReviewData,
   DUMMY_SHOPS,
   DUMMY_SKUS,
   DUMMY_SELLER_PROFILE,
@@ -616,27 +618,57 @@ export function handleMockRequest(rawUrl: string, method: string = "GET", _body?
     };
   }
 
-  if (path.includes("/api/upload-sessions/") && path.includes("/review")) {
+  if (path.includes("/api/ai/upload/analytics") || path.includes("/api/upload/analytics")) {
     return {
       status: 200,
       data: {
         success: true,
-        data: DUMMY_OCR_REVIEW_DATA,
+        data: DUMMY_UPLOAD_ANALYTICS,
+        ...DUMMY_UPLOAD_ANALYTICS,
       },
     };
   }
 
-  if (path.includes("/api/upload/history") || path.includes("/api/ai/upload/sessions")) {
+  if (path.includes("/review") || (path.includes("/api/upload-sessions/") && path.includes("/review"))) {
+    const sessionMatch = path.match(/\/upload-sessions\/([^\/]+)/);
+    const sessionId = sessionMatch ? sessionMatch[1] : undefined;
+    const reviewData = getDummyReviewData(sessionId);
     return {
       status: 200,
       data: {
         success: true,
+        data: reviewData,
+        ...reviewData,
+      },
+    };
+  }
+
+  if (
+    path.includes("/api/ai/upload/queue") ||
+    path.includes("/api/upload/history") ||
+    path.includes("/api/ai/upload/sessions")
+  ) {
+    return {
+      status: 200,
+      data: {
+        success: true,
+        sessions: DUMMY_UPLOAD_SESSIONS,
         data: DUMMY_UPLOAD_SESSIONS,
       },
     };
   }
 
-  if (path.includes("/api/upload/file") || path.includes("/api/upload")) {
+  if (normMethod === "DELETE" && (path.includes("/api/upload/") || path.includes("/api/ai/upload/"))) {
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "File deleted successfully",
+      },
+    };
+  }
+
+  if (path.includes("/api/upload/file") || path.includes("/api/ai/upload") || path.includes("/api/upload")) {
     return {
       status: 200,
       data: {

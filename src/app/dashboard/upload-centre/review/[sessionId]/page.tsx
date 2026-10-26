@@ -27,6 +27,7 @@ import {
 } from '@tanstack/react-table';
 import { useAuth } from '@/contexts/AuthContext';
 import type { StructuredTableData } from '@/hooks/api/useOCRReview';
+import { getDummyReviewData } from '@/lib/constants/dummyData';
 
 // Type definitions (previously from backend service)
 interface TableCell {
@@ -50,266 +51,6 @@ interface OCRReviewData {
   tableData: StructuredTableData;
 }
 
-// Dummy data based on the Vodka dataset
-const DUMMY_TABLE_DATA: StructuredTableData = {
-  headers: [
-    'Sum of qty shname',
-    'Flavoured Plain',
-    'Green Apple',
-    'Orange',
-    'Lime',
-    'Cranberry',
-    'Watermelon',
-    'Chocolate',
-    'Raspberry',
-    'Vanilla',
-    'Saffron',
-    'Grand Total'
-  ],
-  rows: [
-    {
-      id: '1',
-      rowIndex: 0,
-      cells: {
-        'Sum of qty shname': { rowIndex: 0, colIndex: 0, value: 'N-BLOCK' },
-        'Flavoured Plain': { rowIndex: 0, colIndex: 1, value: '483' },
-        'Green Apple': { rowIndex: 0, colIndex: 2, value: '246' },
-        'Orange': { rowIndex: 0, colIndex: 3, value: '136' },
-        'Lime': { rowIndex: 0, colIndex: 4, value: '79' },
-        'Cranberry': { rowIndex: 0, colIndex: 5, value: '27' },
-        'Watermelon': { rowIndex: 0, colIndex: 6, value: '321' },
-        'Chocolate': { rowIndex: 0, colIndex: 7, value: '32' },
-        'Raspberry': { rowIndex: 0, colIndex: 8, value: '21' },
-        'Vanilla': { rowIndex: 0, colIndex: 9, value: '4' },
-        'Saffron': { rowIndex: 0, colIndex: 10, value: '8' },
-        'Grand Total': { rowIndex: 0, colIndex: 11, value: '3063' }
-      }
-    },
-    {
-      id: '2',
-      rowIndex: 1,
-      cells: {
-        'Sum of qty shname': { rowIndex: 1, colIndex: 0, value: 'MALVIYA NAGAR' },
-        'Flavoured Plain': { rowIndex: 1, colIndex: 1, value: '505' },
-        'Green Apple': { rowIndex: 1, colIndex: 2, value: '373' },
-        'Orange': { rowIndex: 1, colIndex: 3, value: '71' },
-        'Lime': { rowIndex: 1, colIndex: 4, value: '52' },
-        'Cranberry': { rowIndex: 1, colIndex: 5, value: '15' },
-        'Watermelon': { rowIndex: 1, colIndex: 6, value: '8' },
-        'Chocolate': { rowIndex: 1, colIndex: 7, value: '15' },
-        'Raspberry': { rowIndex: 1, colIndex: 8, value: '7' },
-        'Vanilla': { rowIndex: 1, colIndex: 9, value: '6' },
-        'Saffron': { rowIndex: 1, colIndex: 10, value: '1' },
-        'Grand Total': { rowIndex: 1, colIndex: 11, value: '1053' }
-      }
-    },
-    {
-      id: '3',
-      rowIndex: 2,
-      cells: {
-        'Sum of qty shname': { rowIndex: 2, colIndex: 0, value: 'SAKET SQUARE MALL' },
-        'Flavoured Plain': { rowIndex: 2, colIndex: 1, value: '440' },
-        'Green Apple': { rowIndex: 2, colIndex: 2, value: '272' },
-        'Orange': { rowIndex: 2, colIndex: 3, value: '78' },
-        'Lime': { rowIndex: 2, colIndex: 4, value: '81' },
-        'Cranberry': { rowIndex: 2, colIndex: 5, value: '41' },
-        'Watermelon': { rowIndex: 2, colIndex: 6, value: '23' },
-        'Chocolate': { rowIndex: 2, colIndex: 7, value: '37' },
-        'Raspberry': { rowIndex: 2, colIndex: 8, value: '16' },
-        'Vanilla': { rowIndex: 2, colIndex: 9, value: '3' },
-        'Saffron': { rowIndex: 2, colIndex: 10, value: '0' },
-        'Grand Total': { rowIndex: 2, colIndex: 11, value: '991' }
-      }
-    },
-    {
-      id: '4',
-      rowIndex: 3,
-      cells: {
-        'Sum of qty shname': { rowIndex: 3, colIndex: 0, value: 'GAZIPUR' },
-        'Flavoured Plain': { rowIndex: 3, colIndex: 1, value: '308' },
-        'Green Apple': { rowIndex: 3, colIndex: 2, value: '468' },
-        'Orange': { rowIndex: 3, colIndex: 3, value: '60' },
-        'Lime': { rowIndex: 3, colIndex: 4, value: '56' },
-        'Cranberry': { rowIndex: 3, colIndex: 5, value: '39' },
-        'Watermelon': { rowIndex: 3, colIndex: 6, value: '12' },
-        'Chocolate': { rowIndex: 3, colIndex: 7, value: '5' },
-        'Raspberry': { rowIndex: 3, colIndex: 8, value: '12' },
-        'Vanilla': { rowIndex: 3, colIndex: 9, value: '0' },
-        'Saffron': { rowIndex: 3, colIndex: 10, value: '0' },
-        'Grand Total': { rowIndex: 3, colIndex: 11, value: '960' }
-      }
-    },
-    {
-      id: '5',
-      rowIndex: 4,
-      cells: {
-        'Sum of qty shname': { rowIndex: 4, colIndex: 0, value: 'CHATTER PUR' },
-        'Flavoured Plain': { rowIndex: 4, colIndex: 1, value: '381' },
-        'Green Apple': { rowIndex: 4, colIndex: 2, value: '325' },
-        'Orange': { rowIndex: 4, colIndex: 3, value: '103' },
-        'Lime': { rowIndex: 4, colIndex: 4, value: '40' },
-        'Cranberry': { rowIndex: 4, colIndex: 5, value: '17' },
-        'Watermelon': { rowIndex: 4, colIndex: 6, value: '10' },
-        'Chocolate': { rowIndex: 4, colIndex: 7, value: '24' },
-        'Raspberry': { rowIndex: 4, colIndex: 8, value: '15' },
-        'Vanilla': { rowIndex: 4, colIndex: 9, value: '4' },
-        'Saffron': { rowIndex: 4, colIndex: 10, value: '0' },
-        'Grand Total': { rowIndex: 4, colIndex: 11, value: '919' }
-      }
-    },
-    {
-      id: '6',
-      rowIndex: 5,
-      cells: {
-        'Sum of qty shname': { rowIndex: 5, colIndex: 0, value: 'VASANT KUNJ' },
-        'Flavoured Plain': { rowIndex: 5, colIndex: 1, value: '396' },
-        'Green Apple': { rowIndex: 5, colIndex: 2, value: '236' },
-        'Orange': { rowIndex: 5, colIndex: 3, value: '136' },
-        'Lime': { rowIndex: 5, colIndex: 4, value: '61' },
-        'Cranberry': { rowIndex: 5, colIndex: 5, value: '7' },
-        'Watermelon': { rowIndex: 5, colIndex: 6, value: '11' },
-        'Chocolate': { rowIndex: 5, colIndex: 7, value: '45' },
-        'Raspberry': { rowIndex: 5, colIndex: 8, value: '8' },
-        'Vanilla': { rowIndex: 5, colIndex: 9, value: '0' },
-        'Saffron': { rowIndex: 5, colIndex: 10, value: '0' },
-        'Grand Total': { rowIndex: 5, colIndex: 11, value: '900' }
-      }
-    },
-    {
-      id: '7',
-      rowIndex: 6,
-      cells: {
-        'Sum of qty shname': { rowIndex: 6, colIndex: 0, value: 'EAST OF KAILASH' },
-        'Flavoured Plain': { rowIndex: 6, colIndex: 1, value: '464' },
-        'Green Apple': { rowIndex: 6, colIndex: 2, value: '272' },
-        'Orange': { rowIndex: 6, colIndex: 3, value: '59' },
-        'Lime': { rowIndex: 6, colIndex: 4, value: '39' },
-        'Cranberry': { rowIndex: 6, colIndex: 5, value: '6' },
-        'Watermelon': { rowIndex: 6, colIndex: 6, value: '7' },
-        'Chocolate': { rowIndex: 6, colIndex: 7, value: '7' },
-        'Raspberry': { rowIndex: 6, colIndex: 8, value: '5' },
-        'Vanilla': { rowIndex: 6, colIndex: 9, value: '0' },
-        'Saffron': { rowIndex: 6, colIndex: 10, value: '1' },
-        'Grand Total': { rowIndex: 6, colIndex: 11, value: '1860' }
-      }
-    },
-    {
-      id: '8',
-      rowIndex: 7,
-      cells: {
-        'Sum of qty shname': { rowIndex: 7, colIndex: 0, value: 'DEFENCE COLONY' },
-        'Flavoured Plain': { rowIndex: 7, colIndex: 1, value: '417' },
-        'Green Apple': { rowIndex: 7, colIndex: 2, value: '185' },
-        'Orange': { rowIndex: 7, colIndex: 3, value: '88' },
-        'Lime': { rowIndex: 7, colIndex: 4, value: '64' },
-        'Cranberry': { rowIndex: 7, colIndex: 5, value: '42' },
-        'Watermelon': { rowIndex: 7, colIndex: 6, value: '24' },
-        'Chocolate': { rowIndex: 7, colIndex: 7, value: '7' },
-        'Raspberry': { rowIndex: 7, colIndex: 8, value: '6' },
-        'Vanilla': { rowIndex: 7, colIndex: 9, value: '0' },
-        'Saffron': { rowIndex: 7, colIndex: 10, value: '1' },
-        'Grand Total': { rowIndex: 7, colIndex: 11, value: '1834' }
-      }
-    },
-    {
-      id: '9',
-      rowIndex: 8,
-      cells: {
-        'Sum of qty shname': { rowIndex: 8, colIndex: 0, value: 'MAHAVIR ENCLAVE' },
-        'Flavoured Plain': { rowIndex: 8, colIndex: 1, value: '253' },
-        'Green Apple': { rowIndex: 8, colIndex: 2, value: '142' },
-        'Orange': { rowIndex: 8, colIndex: 3, value: '55' },
-        'Lime': { rowIndex: 8, colIndex: 4, value: '48' },
-        'Cranberry': { rowIndex: 8, colIndex: 5, value: '18' },
-        'Watermelon': { rowIndex: 8, colIndex: 6, value: '15' },
-        'Chocolate': { rowIndex: 8, colIndex: 7, value: '34' },
-        'Raspberry': { rowIndex: 8, colIndex: 8, value: '7' },
-        'Vanilla': { rowIndex: 8, colIndex: 9, value: '0' },
-        'Saffron': { rowIndex: 8, colIndex: 10, value: '0' },
-        'Grand Total': { rowIndex: 8, colIndex: 11, value: '797' }
-      }
-    }
-  ],
-  metadata: {
-    totalRows: 9,
-    totalCols: 12,
-    extractedAt: new Date().toISOString()
-  }
-};
-
-const DUMMY_REVIEW_DATA: OCRReviewData = {
-  sessionId: "03ca14b3-805e-48c8-97ac-77e2134f50df",
-  filename: "Vodka 5 months Flavoured Wise.pdf",
-  fileType: "application/pdf",
-  uploadedAt: "2025-10-09T14:13:40.698Z",
-  ocrConfidence: "0.9962",
-  processingStatus: "completed",
-  rawText: "itname\n(All)\ncluster\nCorporation\nSum of qty\n",
-  tableData: DUMMY_TABLE_DATA
-};
-
-// Commented out edit functionality - out of scope for now, can be enabled in future
-/*
-interface EditableCellProps {
-  value: string;
-  row: {
-    index: number;
-    original: Record<string, string>;
-  };
-  column: {
-    id: string;
-  };
-  updateData: (rowIndex: number, columnId: string, value: string) => void;
-}
-
-const EditableCell = ({
-  value: initialValue,
-  row,
-  column,
-  updateData
-}: EditableCellProps) => {
-  const [value, setValue] = useState<string>(initialValue || '');
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-
-  const onBlur = () => {
-    setIsEditing(false);
-    if (value !== initialValue) {
-      updateData(row.index, column.id, value);
-    }
-  };
-
-  if (isEditing) {
-    return (
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={onBlur}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            onBlur();
-          } else if (e.key === 'Escape') {
-            setValue(initialValue || '');
-            setIsEditing(false);
-          }
-        }}
-        autoFocus
-        className="w-full px-3 py-2 border border-blue-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
-      />
-    );
-  }
-
-  return (
-    <div
-      onClick={() => setIsEditing(true)}
-      className="w-full px-3 py-2 cursor-text hover:bg-blue-50 rounded-md min-h-[36px] flex items-center transition-colors duration-150"
-    >
-      {value || <span className="text-gray-400 italic">Click to edit</span>}
-    </div>
-  );
-};
-*/
-
 const OCRReviewPage = () => {
   const params = useParams();
   const router = useRouter();
@@ -321,30 +62,28 @@ const OCRReviewPage = () => {
   const { mutate: saveReview, isPending: isSaving } = useSaveOCRReview();
   const { mutate: discardReview } = useDiscardOCRReview();
 
+  const dummySessionReview = useMemo(() => getDummyReviewData(sessionId), [sessionId]);
   const [tableData, setTableData] = useState<StructuredTableData | null>(null);
-  // const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false); // Commented out - edit functionality disabled
-  const [usingDummyData, setUsingDummyData] = useState<boolean>(false);
+  const [usingDummyData, setUsingDummyData] = useState<boolean>(true);
 
   // Initialize table data - Backend first, then dummy data
   React.useEffect(() => {
-    if (reviewData?.tableData && reviewData.tableData.rows.length > 0) {
-      // Backend data available with rows
+    if (reviewData?.tableData && reviewData.tableData.rows?.length > 0) {
       setTableData(reviewData.tableData);
       setUsingDummyData(false);
-    } else if (!isLoading && (error || !reviewData || reviewData.tableData.rows.length === 0)) {
-      // Backend failed or no data - use dummy data
-      setTableData(DUMMY_TABLE_DATA);
+    } else {
+      setTableData(dummySessionReview.tableData);
       setUsingDummyData(true);
     }
-  }, [reviewData, isLoading, error]);
+  }, [reviewData, dummySessionReview]);
 
   // Use actual review data or dummy data
-  const displayReviewData: OCRReviewData = (reviewData && reviewData.tableData.rows.length > 0)
+  const displayReviewData: OCRReviewData = (reviewData && reviewData.tableData?.rows?.length > 0)
     ? {
       ...reviewData,
       ocrConfidence: reviewData.ocrConfidence?.toString() || "0"
     } as OCRReviewData
-    : DUMMY_REVIEW_DATA;
+    : dummySessionReview as unknown as OCRReviewData;
 
   // Convert table data to React Table format
   const reactTableData = useMemo(() => {
@@ -444,21 +183,7 @@ const OCRReviewPage = () => {
   */
 
   const handleDiscard = () => {
-    // Commented out - edit functionality disabled, no unsaved changes to check
-    /*
-    if (hasUnsavedChanges) {
-      const confirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to discard them?'
-      );
-      if (!confirmed) return;
-    }
-    */
-
-    discardReview(sessionId, {
-      onSuccess: () => {
-        router.push('/dashboard/upload-centre');
-      }
-    });
+    router.push('/dashboard/upload-centre');
   };
 
   if (isLoading) {

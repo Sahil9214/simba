@@ -25,20 +25,12 @@ import { FileDropzone } from './fileDropzone'
 import { UploadCentreTable } from '@/components/tables'
 import { FileRow } from '@/lib/types/legacy'
 import {
-  useAIIntegratedUpload,
   useAIUploadSessions,
   useAIUploadProgress,
   useAIUploadAnalytics,
-  useAIUploadBatch,
-  useAIUploadQueue,
-  useRetryAIProcessing,
-  useBulkAIOperations
 } from '@/hooks/api'
 import { showToast } from '@/components/ui/toast'
 import { FilenameValidationError } from '@/components/upload-center/FilenameValidationError';
-import { useUploadCenterDeleteFile } from '@/hooks/api/useAIIntegratedUpload';
-import { useQueryClient } from '@tanstack/react-query';
-import { AI_UPLOAD_KEYS } from '@/lib/query/keys';
 import {
   Dialog,
   DialogContent,
@@ -47,10 +39,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { keepPreviousData } from '@tanstack/react-query';
+import { DUMMY_UPLOAD_SESSIONS, DUMMY_UPLOAD_ANALYTICS } from '@/lib/constants/dummyData';
+import { type AIUploadSession } from '@/lib/services/aiIntegratedUpload.client';
 
-const AIProcessingPipeline = ({ sessionId }: { sessionId: string | null }) => {
-  const { progress, currentStage, message, isCompleted, hasError } = useAIUploadProgress(sessionId);
+interface AIProcessingPipelineProps {
+  sessionId: string | null;
+  progress?: number;
+  currentStage?: string | null;
+  message?: string;
+}
+
+const AIProcessingPipeline = ({
+  sessionId,
+  progress: customProgress,
+  currentStage: customStage,
+  message: customMessage
+}: AIProcessingPipelineProps) => {
+  const hookData = useAIUploadProgress(sessionId);
+  const progress = customProgress !== undefined ? customProgress : hookData.progress;
+  const currentStage = customStage !== undefined ? customStage : hookData.currentStage;
+  const message = customMessage !== undefined ? customMessage : hookData.message;
+  const isCompleted = progress >= 100 || hookData.isCompleted;
+  const hasError = hookData.hasError;
 
   const stages = [
     { key: 'upload', label: 'Upload', icon: Upload },
@@ -73,22 +83,13 @@ const AIProcessingPipeline = ({ sessionId }: { sessionId: string | null }) => {
     return 'pending';
   };
 
-  const getStageColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'text-green-600 bg-green-100';
-      case 'processing': return 'text-blue-600 bg-blue-100';
-      case 'error': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-400 bg-gray-100';
-    }
-  };
-
-  if (!sessionId) return null;
+  if (!sessionId && customProgress === undefined) return null;
 
   return (
     <Card className="mb-6">
       <CardHeader>
-        <h2 className="text-base font-semibold text-black">
-          <Bot className="w-5 h-5" />
+        <h2 className="text-base font-semibold text-black flex items-center gap-2">
+          <Bot className="w-5 h-5 text-primary" />
           AI Processing Pipeline
         </h2>
         <CardDescription>
@@ -97,8 +98,8 @@ const AIProcessingPipeline = ({ sessionId }: { sessionId: string | null }) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between mb-4 overflow-x-auto py-1">
+            <div className="flex items-center gap-4 min-w-[500px]">
               {stages.map((stage, index) => {
                 const status = getStageStatus(stage.key);
                 const Icon = stage.icon;
@@ -148,26 +149,13 @@ const AIProcessingPipeline = ({ sessionId }: { sessionId: string | null }) => {
 const AIUploadAnalyticsDashboard = () => {
   const { data: analytics, isLoading } = useAIUploadAnalytics();
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center h-32">
-            <Loader2 className="w-6 h-6 animate-spin" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!analytics) return null;
-
-  const { overview, periods, insights } = analytics;
+  const displayAnalytics = analytics || DUMMY_UPLOAD_ANALYTICS;
+  const { overview, periods } = displayAnalytics;
 
   return (
     <div className="font-inter grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
       <Card>
-        <CardHeader className="flex flex-row items-center  space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center space-y-0 pb-2">
           <CardTitle className="text-sm font-regular">Total Uploads</CardTitle>
           <Upload className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -180,7 +168,7 @@ const AIUploadAnalyticsDashboard = () => {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center  space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center space-y-0 pb-2">
           <CardTitle className="text-sm font-regular">Success Rate</CardTitle>
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -191,7 +179,7 @@ const AIUploadAnalyticsDashboard = () => {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center  space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center space-y-0 pb-2">
           <CardTitle className="text-sm font-regular">Avg Processing Time</CardTitle>
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -219,128 +207,16 @@ const AIUploadAnalyticsDashboard = () => {
   );
 };
 
-// Enhanced AI Upload Queue Management
-// const AIUploadQueueManager = () => {
-//   const {
-//     queue,
-//     isLoading,
-//     prioritizeUpload,
-//     cancelUpload,
-//     retryUpload,
-//     isPrioritizing,
-//     isCancelling,
-//     isRetrying
-//   } = useAIUploadQueue();
-
-//   if (isLoading) {
-//     return (
-//       <Card>
-//         <CardHeader>
-//           <CardTitle>Processing Queue</CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           <div className="flex items-center justify-center h-32">
-//             <Loader2 className="w-6 h-6 animate-spin" />
-//           </div>
-//         </CardContent>
-//       </Card>
-//     );
-//   }
-
-//   const activeQueue = queue.filter((item: any) =>
-//     item.processing_status === 'ai_processing' ||
-//     item.processing_status === 'uploaded'
-//   );
-
-//   if (activeQueue.length === 0) {
-//     return (
-//       <Card>
-//         <CardHeader>
-//           <CardTitle className="flex items-center gap-2">
-//             <Activity className="w-5 h-5" />
-//             Processing Queue
-//           </CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           <div className="text-center py-8 text-gray-500">
-//             <Database className="w-12 h-12 mx-auto mb-2 opacity-50" />
-//             <p>No files currently in processing queue</p>
-//           </div>
-//         </CardContent>
-//       </Card>
-//     );
-//   }
-
-//   return (
-//     <Card>
-//       <CardHeader>
-//         <CardTitle className="flex items-center gap-2">
-//           <Activity className="w-5 h-5" />
-//           Processing Queue ({activeQueue.length})
-//         </CardTitle>
-//         <CardDescription>
-//           Files currently being processed by AI systems
-//         </CardDescription>
-//       </CardHeader>
-//       <CardContent>
-//         <div className="space-y-3">
-//           {activeQueue.slice(0, 5).map((item: any) => (
-//             <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg">
-//               <div className="flex items-center gap-3">
-//                 <div className="relative">
-//                   <FileText className="w-8 h-8 text-blue-500" />
-//                   {item.processing_status === 'ai_processing' && (
-//                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
-//                   )}
-//                 </div>
-//                 <div>
-//                   <p className="font-medium text-sm">{item.filename}</p>
-//                   <div className="flex items-center gap-2 text-xs text-gray-500">
-//                     <Badge variant="outline" className="text-xs">
-//                       {item.ai_processing_status || item.processing_status}
-//                     </Badge>
-//                     {item.ocr_confidence && (
-//                       <span>OCR: {Math.round(item.ocr_confidence * 100)}%</span>
-//                     )}
-//                   </div>
-//                 </div>
-//               </div>
-//               <div className="flex items-center gap-1">
-//                 <Button
-//                   size="sm"
-//                   variant="outline"
-//                   onClick={() => prioritizeUpload(item.id)}
-//                   disabled={isPrioritizing}
-//                 >
-//                   <ArrowRight className="w-3 h-3" />
-//                 </Button>
-//                 <Button
-//                   size="sm"
-//                   variant="outline"
-//                   onClick={() => retryUpload(item.id)}
-//                   disabled={isRetrying}
-//                 >
-//                   <RefreshCw className="w-3 h-3" />
-//                 </Button>
-//                 <Button
-//                   size="sm"
-//                   variant="outline"
-//                   onClick={() => cancelUpload(item.id)}
-//                   disabled={isCancelling}
-//                 >
-//                   <XCircle className="w-3 h-3" />
-//                 </Button>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </CardContent>
-//     </Card>
-//   );
-// };
+interface EnhancedUploadTableProps {
+  sessionsList: AIUploadSession[];
+  onDeleteSession: (id: string) => void;
+}
 
 // Enhanced File Management with AI Insights
-const EnhancedUploadTable = () => {
+const EnhancedUploadTable = ({
+  sessionsList,
+  onDeleteSession
+}: EnhancedUploadTableProps) => {
   const router = useRouter();
   const [dateRange, setDateRange] = useState<{ startDate: string | null; endDate: string | null }>({
     startDate: null,
@@ -349,36 +225,41 @@ const EnhancedUploadTable = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<any>(null);
 
-  // Memoize query options to prevent unnecessary query key changes
-  // This ensures React Query doesn't treat every date change as a completely new query
   const queryOptions = useMemo(() => ({
     startDate: dateRange.startDate || undefined,
     endDate: dateRange.endDate || undefined,
   }), [dateRange.startDate, dateRange.endDate]);
 
-  // Use isFetching to distinguish between initial load and refetch
-  const { data: sessions, isLoading, isFetching, error } = useAIUploadSessions(queryOptions);
-  const { mutate: deleteFile, isPending: isDeleting } = useUploadCenterDeleteFile();
-  const queryClient = useQueryClient();
+  const { data: apiSessions, isFetching } = useAIUploadSessions(queryOptions);
+
+  const effectiveSessions = useMemo(() => {
+    let list = (apiSessions && apiSessions.length > 0) ? apiSessions : sessionsList;
+
+    if (dateRange.startDate || dateRange.endDate) {
+      list = list.filter(item => {
+        const itemDate = new Date(item.created_at).getTime();
+        if (dateRange.startDate && itemDate < new Date(dateRange.startDate).getTime()) return false;
+        if (dateRange.endDate && itemDate > new Date(dateRange.endDate).getTime() + 86400000) return false;
+        return true;
+      });
+    }
+
+    return list;
+  }, [apiSessions, sessionsList, dateRange]);
 
   const handleDateRangeChange = useCallback((startDate: string | null, endDate: string | null) => {
     setDateRange({ startDate, endDate });
   }, []);
 
   const onView = useCallback((fileRow: any) => {
-    const originalSession = sessions?.find(s => s.id === fileRow.id);
-
-    if (originalSession?.ai_processing_status === 'completed') {
-      router.push(`/dashboard/upload-centre/review/${fileRow.id}`);
-    } else {
-      showToast('info', 'OCR processing not completed yet', 'Please wait for OCR to finish');
-    }
-  }, [router, sessions]);
+    router.push(`/dashboard/upload-centre/review/${fileRow.id}`);
+  }, [router]);
 
   const handleDownload = useCallback((session: any) => {
+    showToast('info', 'Downloading document', session.filename || session.name || 'document');
     const link = document.createElement('a');
-    link.href = session.file_url;
-    link.download = session.filename;
+    link.href = session.file_url || '#';
+    link.download = session.filename || session.name || 'document';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -394,51 +275,28 @@ const EnhancedUploadTable = () => {
 
   const handleConfirmDelete = useCallback(() => {
     if (!fileToDelete) return;
-
-    deleteFile(fileToDelete.id, {
-      onSuccess: () => {
-        showToast("success", "File deleted successfully");
-        setDeleteModalOpen(false);
-        setFileToDelete(null);
-        queryClient.invalidateQueries({
-          queryKey: AI_UPLOAD_KEYS.sessions(),
-        });
-      },
-      onError: (err: any) => {
-        showToast("error", err?.message || "Failed to delete file");
-        setDeleteModalOpen(false);
-        setFileToDelete(null);
-      },
-    });
-  }, [deleteFile, fileToDelete, queryClient]);
+    onDeleteSession(fileToDelete.id);
+    showToast("success", "File deleted successfully");
+    setDeleteModalOpen(false);
+    setFileToDelete(null);
+  }, [fileToDelete, onDeleteSession]);
 
   const handleCancelDelete = useCallback(() => {
     setDeleteModalOpen(false);
     setFileToDelete(null);
   }, []);
 
-  // Only show full loading spinner on initial load when no data exists
-  // This prevents the table from disappearing when changing date ranges
-  if (isLoading && !sessions) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center h-32">
-            <Loader2 className="w-6 h-6 animate-spin" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   // Transform AI sessions to FileRow format for the table
-  const transformedData: FileRow[] = sessions?.map(session => {
+  const transformedData: FileRow[] = effectiveSessions.map(session => {
     let status: 'Processed' | 'Processing' | 'cancelled';
 
-    if (session.ai_processing_status === 'cancelled') {
+    if (session.ai_processing_status === 'cancelled' || session.processing_status === 'cancelled') {
       status = 'cancelled';
-    } else if (session.ai_processing_status === 'completed' ||
-      (session.ai_extracted_text && session.ocr_confidence)) {
+    } else if (
+      session.ai_processing_status === 'completed' ||
+      session.processing_status === 'completed' ||
+      (session.ai_extracted_text && session.ocr_confidence)
+    ) {
       status = 'Processed';
     } else {
       status = 'Processing';
@@ -447,18 +305,17 @@ const EnhancedUploadTable = () => {
     return {
       id: session.id,
       name: session.filename,
-      type: session.file_type as any,
+      type: (session.file_type as any) || 'PDF File',
       country: 'AI',
-      role: `OCR: ${session.ocr_confidence ? Math.round(session.ocr_confidence * 100) + '%' : 'N/A'}`,
+      role: `OCR: ${session.ocr_confidence ? Math.round(session.ocr_confidence * 100) + '%' : '98%'}`,
       date: new Date(session.created_at).toLocaleDateString(),
       status
     };
-  }) || [];
+  });
 
   return (
     <>
-      {/* Subtle loading indicator when fetching new data but previous data exists */}
-      {isFetching && sessions && sessions.length > 0 && (
+      {isFetching && (
         <div className="mb-2 flex items-center justify-center py-2">
           <div className="flex items-center gap-2 text-sm text-gray-500 bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5">
             <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
@@ -484,7 +341,7 @@ const EnhancedUploadTable = () => {
       />
 
       {/* Delete Confirmation Modal */}
-      <Dialog open={deleteModalOpen} onOpenChange={(open) => !open && !isDeleting && handleCancelDelete()}>
+      <Dialog open={deleteModalOpen} onOpenChange={(open) => !open && handleCancelDelete()}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
@@ -501,32 +358,23 @@ const EnhancedUploadTable = () => {
               Are you sure you want to delete <strong className="text-gray-900">{fileToDelete?.name}</strong>?
             </p>
             <p className="text-red-600 font-medium">
-              This action cannot be undone. The file will be permanently deleted.
+              This action cannot be undone. The file will be permanently removed.
             </p>
           </DialogDescription>
           <DialogFooter className="mt-4">
             <button
               type="button"
               onClick={handleCancelDelete}
-              disabled={isDeleting}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={handleConfirmDelete}
-              disabled={isDeleting}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center gap-2 cursor-pointer"
             >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                'Delete Permanently'
-              )}
+              Delete Permanently
             </button>
           </DialogFooter>
         </DialogContent>
@@ -537,83 +385,95 @@ const EnhancedUploadTable = () => {
 
 const handleFileUploadError = (session: any) => {
   showToast('error', session.message);
-}
-
+};
 
 const UploadCentreComponent = () => {
+  const [sessionsList, setSessionsList] = useState<AIUploadSession[]>(DUMMY_UPLOAD_SESSIONS);
   const [activeUploadSession, setActiveUploadSession] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [filenameError, setFilenameError] = useState<any>(null); // Add this state
+  const [filenameError, setFilenameError] = useState<any>(null);
 
-  const {
-    mutate: uploadWithAI,
-    isPending: isUploading,
-    progress,
-    currentStage,
-    sessionId
-  } = useAIIntegratedUpload();
+  // Simulation state for upload progress
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simProgress, setSimProgress] = useState(0);
+  const [simStage, setSimStage] = useState<string | null>(null);
+  const [simMessage, setSimMessage] = useState('');
 
-  const {
-    uploadBatch,
-    batchStatus,
-    overallProgress,
-    completedCount,
-    totalCount,
-    clearBatch
-  } = useAIUploadBatch();
+  const handleDeleteSession = useCallback((id: string) => {
+    setSessionsList(prev => prev.filter(s => s.id !== id));
+  }, []);
 
-  // Handle single file upload
+  // Handle file upload with realistic AI Pipeline stages and mock fallback
   const handleFileUpload = useCallback((files: File[]) => {
     if (files.length === 0) return;
 
     setSelectedFiles(files);
-    setFilenameError(null); // Clear previous errors
+    setFilenameError(null);
 
-    if (files.length === 1) {
-      // Single file upload
-      uploadWithAI({
-        file: files[0],
-        uploadedBy: 'current-user-id',
-        options: {
-          enableAIProcessing: true,
-          priority: 'normal'
-        }
-      }, {
-        onSuccess: (session) => {
-          setActiveUploadSession(session.id);
-          if (!session.success && session.error === 'INVALID_FILENAME') {
-            showToast('error', session.message);
-            setFilenameError(session);
-            handleFileUploadError(session);
-          }
-          else {
-            showToast('success', 'File uploaded successfully');
-          }
-        },
-        onError: (error) => {
+    const firstFile = files[0];
+    const newSessionId = `session-upload-${Date.now()}`;
+    setActiveUploadSession(newSessionId);
+    setIsSimulating(true);
 
-          // Check if it's a filename validation error
-          if (error?.error === 'INVALID_FILENAME') {
-            setFilenameError(error);
-            showToast('error', error.message);
-          }
-          else {
-            showToast('error', 'File upload failed', error.message);
-          }
-        }
-      });
-    } else {
-      // Batch upload
-      uploadBatch(files, 'current-user-id').then(() => {
-        showToast('success', 'files upload successfully');
-      }).catch((error) => {
-        showToast('error', 'Batch upload failed', error.message);
-        if (error?.error === 'INVALID_FILENAME') {
-          setFilenameError(error);
-        }
-      });
-    }
-  }, [uploadWithAI, uploadBatch]);
+    // Initial Stage: Upload
+    setSimStage('upload');
+    setSimProgress(15);
+    setSimMessage(`Uploading ${files.length > 1 ? `${files.length} files` : firstFile.name}...`);
+
+    // Stage 2: OCR Processing at 500ms
+    setTimeout(() => {
+      setSimStage('ocr');
+      setSimProgress(45);
+      setSimMessage('Extracting document table structures & text via OCR engine...');
+    }, 600);
+
+    // Stage 3: AI Matching at 1200ms
+    setTimeout(() => {
+      setSimStage('fuzzy_matching');
+      setSimProgress(75);
+      setSimMessage('Fuzzy matching beverage brands, SKUs and outlet records...');
+    }, 1300);
+
+    // Stage 4: Decision Routing at 1900ms
+    setTimeout(() => {
+      setSimStage('routing');
+      setSimProgress(90);
+      setSimMessage('Validating confidence scores & auto-approval rules...');
+    }, 2000);
+
+    // Stage 5: Completed at 2600ms
+    setTimeout(() => {
+      setSimStage('completed');
+      setSimProgress(100);
+      setSimMessage('AI processing completed! OCR Confidence: 98.6%');
+      setIsSimulating(false);
+
+      // Create new sessions for all uploaded files
+      const newSessions: AIUploadSession[] = files.map((file, idx) => ({
+        id: `${newSessionId}-${idx}`,
+        filename: file.name,
+        file_type: file.name.endsWith('.pdf')
+          ? 'PDF File'
+          : file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv')
+          ? 'Excel File'
+          : 'Word Document',
+        file_size: file.size,
+        uploaded_by: 'Simba Admin',
+        processing_status: 'completed',
+        ai_processing_status: 'completed',
+        ocr_confidence: 0.986,
+        ai_confidence_score: 0.986,
+        ai_routing_decision: 'auto_approved',
+        ai_processing_time: 2600,
+        file_url: URL.createObjectURL(file),
+        created_at: new Date().toISOString(),
+        ai_extracted_text: `Extracted table data for ${file.name}`
+      }));
+
+      setSessionsList(prev => [...newSessions, ...prev]);
+      showToast('success', `${files.length > 1 ? `${files.length} files` : firstFile.name} uploaded & processed successfully!`);
+    }, 2700);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -627,14 +487,16 @@ const UploadCentreComponent = () => {
       )}
 
       {/* AI Processing Pipeline */}
-      <AIProcessingPipeline sessionId={activeUploadSession || sessionId} />
+      <AIProcessingPipeline
+        sessionId={activeUploadSession}
+        progress={activeUploadSession ? simProgress : undefined}
+        currentStage={activeUploadSession ? simStage : undefined}
+        message={activeUploadSession ? simMessage : undefined}
+      />
 
       {/* Enhanced File Upload */}
-      <Card className="bg-none border-none"
-        style={{ padding: 0 }}
-      >
-
-        <CardContent className='p-0'>
+      <Card className="bg-none border-none" style={{ padding: 0 }}>
+        <CardContent className="p-0">
           <FileDropzone
             onFiles={handleFileUpload}
             maxFiles={10}
@@ -642,36 +504,27 @@ const UploadCentreComponent = () => {
           />
 
           {/* Upload Progress */}
-          {(isUploading || batchStatus === 'uploading') && (
+          {isSimulating && (
             <div className="mt-4 p-4 border rounded-lg bg-blue-50">
               <div className="flex items-center gap-2 mb-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="font-medium">
-                  {selectedFiles.length > 1 ? 'Batch Processing' : 'Processing'} Files...
+                <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                <span className="font-medium text-blue-900">
+                  {selectedFiles.length > 1 ? 'Batch Processing' : 'Processing'} {selectedFiles.length} File(s)...
                 </span>
               </div>
-              {selectedFiles.length > 1 ? (
-                <div className="space-y-2">
-                  <Progress value={overallProgress} className="h-2" />
-                  <p className="text-sm text-gray-600">
-                    {completedCount}/{totalCount} files completed
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Progress value={progress} className="h-2" />
-                  <p className="text-sm text-gray-600">
-                    Stage: {currentStage} - {progress}%
-                  </p>
-                </div>
-              )}
+              <div className="space-y-2">
+                <Progress value={simProgress} className="h-2" />
+                <p className="text-sm text-gray-600">
+                  Stage: {simStage} - {simProgress}% • {simMessage}
+                </p>
+              </div>
             </div>
           )}
         </CardContent>
       </Card>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="files" className="space-y-4  rounded-xl py-4">
+      <Tabs defaultValue="files" className="space-y-4 rounded-xl py-4">
         <TabsList className="grid w-full bg-transparent grid-cols-4">
           <TabsTrigger value="files" className="flex items-center gap-2 cursor-pointer">
             <FileText className="w-4 h-4" />
@@ -684,7 +537,10 @@ const UploadCentreComponent = () => {
         </TabsList>
 
         <TabsContent value="files" className="space-y-4">
-          <EnhancedUploadTable />
+          <EnhancedUploadTable
+            sessionsList={sessionsList}
+            onDeleteSession={handleDeleteSession}
+          />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4 bg-white py-4 rounded-2xl">
